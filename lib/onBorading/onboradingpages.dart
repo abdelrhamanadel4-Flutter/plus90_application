@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:plus90_application/onBorading/onboradingScrean.dart';
+import 'package:plus90_application/utils/AppRoutes.dart';
 import 'package:plus90_application/utils/app-assets.dart';
 
 class Onboradingpages extends StatefulWidget {
@@ -76,6 +77,7 @@ class _OnboradingpagesState extends State<Onboradingpages> {
               child: ElevatedButton(
                 style: ButtonStyle(),
                 onPressed: () {
+                  Navigator.pushNamed(context, Approutes.auth);
                   // Navigate to the next screen
                 },
                 child: Text(

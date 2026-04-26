@@ -54,7 +54,6 @@ class _SplachScreenState extends State<SplachScreen>
 
     startAnimation();
 
-    /// ⏱️ بعد 2.5 ثانية يروح للـ Onboarding
     Future.delayed(Duration(milliseconds: 2500), () {
       Navigator.pushReplacement(
         context,
@@ -95,7 +94,6 @@ class _SplachScreenState extends State<SplachScreen>
           child: Stack(
             alignment: Alignment.center,
             children: [
-              /// صورة 2 (من تحت)
               SlideTransition(
                 position: animation2,
                 child: Transform.translate(
@@ -104,7 +102,6 @@ class _SplachScreenState extends State<SplachScreen>
                 ),
               ),
 
-              /// صورة 1 (من الشمال)
               SlideTransition(
                 position: animation1,
                 child: Transform.translate(
@@ -113,7 +110,6 @@ class _SplachScreenState extends State<SplachScreen>
                 ),
               ),
 
-              /// صورة 3 (من اليمين)
               SlideTransition(
                 position: animation3,
                 child: Transform.translate(
