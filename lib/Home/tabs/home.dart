@@ -5,6 +5,7 @@ import 'package:plus90_application/screens/profile_screen.dart';
 import 'package:plus90_application/screens/scan_screen.dart';
 import 'package:plus90_application/screens/sell_screen.dart';
 import 'package:plus90_application/screens/notification_screen.dart';
+import 'package:plus90_application/utils/app_color.dart';
 
 class HomeUI extends StatefulWidget {
   const HomeUI({super.key});
@@ -16,7 +17,6 @@ class HomeUI extends StatefulWidget {
 class _HomeUIState extends State<HomeUI> {
   late final PageController _controller;
   int _currentPage = 1;
-  int _selectedIndex = 0;
 
   late final List<Widget> banners;
 
@@ -267,102 +267,6 @@ class _HomeUIState extends State<HomeUI> {
             ),
           ),
         ),
-      ),
-
-      bottomNavigationBar: Stack(
-        clipBehavior: Clip.none,
-        alignment: Alignment.bottomCenter,
-        children: [
-          BottomNavigationBar(
-            currentIndex: _selectedIndex,
-            onTap: (index) {
-              if (index == 2) return;
-
-              setState(() {
-                _selectedIndex = index;
-              });
-
-              if (index == 1) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const SearchScreen()),
-                );
-              } else if (index == 3) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const CartScreen()),
-                );
-              } else if (index == 4) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const ProfileScreen()),
-                );
-              }
-            },
-
-            //bottom nav design
-            backgroundColor: Colors.white,
-            type: BottomNavigationBarType.fixed,
-            selectedItemColor: const Color(0xFFE12C00),
-            unselectedItemColor: Colors.blueGrey.shade200,
-            showUnselectedLabels: true,
-            elevation: 10,
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home_outlined),
-                activeIcon: Icon(Icons.home),
-                label: "Home",
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.search),
-                label: "Search",
-              ),
-              BottomNavigationBarItem(icon: SizedBox(), label: ""),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.shopping_cart_outlined),
-                activeIcon: Icon(Icons.shopping_cart),
-                label: "Cart",
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.person_outline),
-                activeIcon: Icon(Icons.person),
-                label: "Profile",
-              ),
-            ],
-          ),
-          // الزرار للي بيفتح ال scan screen
-          Positioned(
-            bottom: 25,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ScanScreen()),
-                );
-              },
-              child: Container(
-                height: 65,
-                width: 65,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE12C00),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.deepPurple.withOpacity(0.20),
-                      blurRadius: 18,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.center_focus_strong,
-                  color: Colors.white,
-                  size: 28,
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

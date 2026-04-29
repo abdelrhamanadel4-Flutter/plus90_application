@@ -12,4 +12,8 @@ class AppAssets {
   static const String google = 'assets/images/g.png';
   static const String facebook = 'assets/images/facebook.png';
   static const String apple = 'assets/images/apple.png';
+  static const String home = 'assets/images/homeicon.png';
+  static const String search = 'assets/images/search.png';
+  static const String cart = 'assets/images/cart.png';
+  static const String profile = 'assets/images/user.png';
 }

@@ -5,10 +5,10 @@ import 'package:plus90_application/utils/custom-elveted-buttom.dart';
 import 'package:plus90_application/utils/custom_text_from.dart';
 
 class Login extends StatelessWidget {
-  const Login({super.key});
-
   height(context) => MediaQuery.of(context).size.height;
   width(context) => MediaQuery.of(context).size.width;
+  TextEditingController email = TextEditingController();
+  TextEditingController password = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,17 +40,37 @@ class Login extends StatelessWidget {
             Text('Email', style: AppStyle.medium14orange),
             SizedBox(height: height(context) * 0.01),
             CustomTextFormField(
+              controller: email,
               hint: 'Enter your email address',
               keyboardType: TextInputType.emailAddress,
               hintStyle: AppStyle.medium11ramdi,
+              validator: (text) {
+                if (text == null || text.trim().isEmpty)
+                  return 'please enter email';
+                final bool emailValid = RegExp(
+                  r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
+                ).hasMatch(text);
+                if (!emailValid) {
+                  return 'Please enter Vaild Email';
+                }
+                return null;
+              },
             ),
             SizedBox(height: height(context) * 0.02),
             Text('Password', style: AppStyle.medium14orange),
             SizedBox(height: height(context) * 0.01),
             CustomTextFormField(
+              controller: password,
               hint: 'Enter your password',
               obscureText: true,
               hintStyle: AppStyle.medium11ramdi,
+              validator: (text) {
+                if (text == null || text.trim().isEmpty)
+                  return 'please enter password';
+                if (text.trim().length < 6)
+                  return 'password must be at least 6 characters';
+                return null;
+              },
             ),
             Row(
               children: [

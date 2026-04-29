@@ -6,4 +6,5 @@ class Approutes {
   static const String registers = 'registers';
   static const String Choosetype = 'Choosetype';
   static const String Home = 'Home';
+  static const String HomeScreen = 'HomeScreen';
 }

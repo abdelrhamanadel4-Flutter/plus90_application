@@ -67,7 +67,7 @@ class _ChoosetypeState extends State<Choosetype> {
               CustomElevatedButton(
                 onPressed: () {
                   if (selectedIndex == 0) {
-                    Navigator.pushNamed(context, Approutes.Home);
+                    Navigator.pushNamed(context, Approutes.HomeScreen);
                   } else {
                     // Show a message to select an account type
                     ScaffoldMessenger.of(context).showSnackBar(

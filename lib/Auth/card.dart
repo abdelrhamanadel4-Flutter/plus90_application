@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:plus90_application/utils/app_color.dart';
 
 class AccountCard extends StatelessWidget {
   final String title;
@@ -39,13 +40,13 @@ class AccountCard extends StatelessWidget {
             color: Colors.white,
             borderRadius: BorderRadius.circular(w(context, 0.04)),
             border: Border.all(
-              color: isSelected ? Colors.red : Colors.grey.shade300,
+              color: isSelected ? AppColor.orange : Colors.grey.shade300,
               width: 1.5,
             ),
             boxShadow: isSelected
                 ? [
                     BoxShadow(
-                      color: Colors.red.withOpacity(0.2),
+                      color: AppColor.orange.withOpacity(0.2),
                       blurRadius: 15,
                       spreadRadius: 1,
                       offset: Offset(0, 5),
@@ -89,9 +90,9 @@ class AccountCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(6),
                       border: Border.all(
-                        color: isSelected ? Colors.red : Colors.grey,
+                        color: isSelected ? AppColor.orange : Colors.grey,
                       ),
-                      color: isSelected ? Colors.red : Colors.transparent,
+                      color: isSelected ? AppColor.orange : Colors.transparent,
                     ),
                     child: AnimatedOpacity(
                       duration: Duration(milliseconds: 200),
