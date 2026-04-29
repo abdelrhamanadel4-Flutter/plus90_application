@@ -15,7 +15,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
-  bool isSelected = false;
 
   List<Widget> _pages = [HomeUI(), SearchTab(), CartTab(), ProfileTab()];
 
@@ -28,7 +27,6 @@ class _HomeScreenState extends State<HomeScreen> {
           currentIndex: _selectedIndex,
           onTap: (index) {
             setState(() => _selectedIndex = index);
-            isSelected = _selectedIndex == index;
           },
           type: BottomNavigationBarType.fixed,
           items: [
