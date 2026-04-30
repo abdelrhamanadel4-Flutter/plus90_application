@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:plus90_application/screens/search_screen.dart';
-import 'package:plus90_application/screens/cart_screen.dart';
-import 'package:plus90_application/screens/profile_screen.dart';
 import 'package:plus90_application/screens/scan_screen.dart';
 import 'package:plus90_application/screens/sell_screen.dart';
 import 'package:plus90_application/screens/notification_screen.dart';
