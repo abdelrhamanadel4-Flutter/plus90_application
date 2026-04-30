@@ -40,7 +40,7 @@ class CustomTextFormField extends StatelessWidget {
     this.borderColor = Colors.transparent,
     this.focusedBorderColor = Colors.transparent,
     this.errorBorderColor = Colors.redAccent,
-    this.textColor = Colors.white,
+    this.textColor = const Color.fromARGB(255, 20, 23, 20),
     this.iconColor = Colors.white70,
     this.cursorColor = AppColor.grayColor,
     this.fillColor = AppColor.grayColor, // ✅ اللون الافتراضي للخلفية

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:plus90_application/screens/scan_screen.dart';
 import 'package:plus90_application/screens/sell_screen.dart';
 import 'package:plus90_application/screens/notification_screen.dart';
@@ -92,7 +93,7 @@ class _HomeUIState extends State<HomeUI> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
               decoration: BoxDecoration(
-                color: const Color(0xFFE12C00),
+                color: Color(0xFF861E43),
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
@@ -143,7 +144,7 @@ class _HomeUIState extends State<HomeUI> {
                       decoration: const BoxDecoration(
                         shape: BoxShape.circle,
                         gradient: LinearGradient(
-                          colors: [Color(0xFFE12C00), Color(0xFF97B6B1)],
+                          colors: [Color(0xFF861E43), Color(0xFF97B6B1)],
                         ),
                       ),
                       child: const Text(
@@ -173,7 +174,7 @@ class _HomeUIState extends State<HomeUI> {
                         ),
                         child: const Icon(
                           Icons.notifications_none,
-                          color: Color(0xFFE12C00),
+                          color: Color(0xFF861E43),
                         ),
                       ),
                     ),
@@ -188,13 +189,13 @@ class _HomeUIState extends State<HomeUI> {
                     hintText: "Search deals, restaurants, activities...",
                     prefixIcon: const Icon(
                       Icons.search_outlined,
-                      color: Color(0xFFE12C00),
+                      color: Color(0xFF861E43),
                     ),
                     filled: true,
                     fillColor: Colors.white,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
-                      borderSide: const BorderSide(color: Color(0xFFE12C00)),
+                      borderSide: const BorderSide(color: Color(0xFF861E43)),
                     ),
                   ),
                 ),
@@ -290,7 +291,7 @@ class _HomeUIState extends State<HomeUI> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
         gradient: const LinearGradient(
-          colors: [Color(0xFFE12C00), Color(0xFF97B6B1)],
+          colors: [Color(0xFF861E43), Color(0xFF97B6B1)],
         ),
       ),
       child: Row(
@@ -320,15 +321,15 @@ class _HomeUIState extends State<HomeUI> {
           style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Color(0xFFE12C00),
+            color: Color(0xFF861E43),
           ),
         ),
         const Text(
           "See All",
           style: TextStyle(
-            color: Color(0xFFE12C00),
+            color: Color(0xFF861E43),
             decoration: TextDecoration.underline,
-            decorationColor: Color(0xFFE12C00),
+            decorationColor: Color(0xFF861E43),
           ),
         ),
       ],
@@ -351,7 +352,7 @@ class _HomeUIState extends State<HomeUI> {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: const Color(0xFFE12C00),
+            color: const Color(0xFF861E43),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, color: Colors.white),
@@ -360,7 +361,7 @@ class _HomeUIState extends State<HomeUI> {
         Text(
           label,
           style: const TextStyle(
-            color: Color(0xFFE12C00),
+            color: Color(0xFF861E43),
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -426,7 +427,7 @@ class _HomeUIState extends State<HomeUI> {
                 child: const Text(
                   "-40%",
                   style: TextStyle(
-                    color: Color(0xFFE12C00),
+                    color: Color(0xFF861E43),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -452,7 +453,7 @@ class _HomeUIState extends State<HomeUI> {
               Text(
                 "\$72.00",
                 style: TextStyle(
-                  color: Color(0xFFE12C00),
+                  color: Color(0xFF861E43),
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),
