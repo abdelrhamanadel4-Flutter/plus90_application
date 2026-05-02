@@ -1,6 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:plus90_application/Home/homeScrean.dart' as AppRoutes;
+import 'package:plus90_application/Home/user/homeScrean.dart' as AppRoutes;
 import 'package:plus90_application/utils/AppRoutes.dart';
 import 'package:plus90_application/utils/Dialog_utils.dart';
 import 'package:plus90_application/utils/app-assets.dart';
@@ -117,11 +118,21 @@ class Login extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image.asset(AppAssets.google),
+                    GestureDetector(
+                      onTap: () {
+                        // Handle Google login logic here
+                      },
+                      child: Image.asset(AppAssets.google),
+                    ),
                     SizedBox(width: width(context) * 0.05),
                     Image.asset(AppAssets.facebook),
                     SizedBox(width: width(context) * 0.05),
-                    Image.asset(AppAssets.apple),
+                    GestureDetector(
+                      onTap: () {
+                        // Handle Apple login logic here
+                      },
+                      child: Image.asset(AppAssets.apple),
+                    ),
                   ],
                 ),
               ],
@@ -149,10 +160,29 @@ class Login extends StatelessWidget {
           message: 'Login Successfully.',
           title: 'Success',
           posActionName: 'OK',
-          posAction: () {
-            Navigator.of(
-              context,
-            ).pushNamedAndRemoveUntil(Approutes.HomeScreen, (route) => false);
+          posAction: () async {
+            var uid = FirebaseAuth.instance.currentUser!.uid;
+
+            var doc = await FirebaseFirestore.instance
+                .collection('users')
+                .doc(uid)
+                .get();
+
+            String accountType = doc['accountType'];
+
+            if (accountType == "user") {
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                Approutes.HomeScreen,
+                (route) => false,
+              );
+            } else {
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                Approutes.HomescreanStore,
+                (route) => false,
+              );
+            }
           },
         );
       } on FirebaseAuthException catch (e) {

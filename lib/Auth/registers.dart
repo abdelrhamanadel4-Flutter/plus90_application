@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:plus90_application/Auth/choosetype.dart' as AppRoutes;
+import 'package:plus90_application/Auth/choosetype.dart';
 import 'package:plus90_application/utils/AppRoutes.dart';
 import 'package:plus90_application/utils/Dialog_utils.dart';
 import 'package:plus90_application/utils/app-assets.dart';
@@ -215,7 +216,16 @@ class _RegistersState extends State<Registers> {
           title: 'Success',
           posActionName: 'OK',
           posAction: () {
-            Navigator.pop(context);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Choosetype(
+                  name: name.text,
+                  email: email.text,
+                  phone: phone.text,
+                ),
+              ),
+            );
           },
         );
       } on FirebaseAuthException catch (e) {

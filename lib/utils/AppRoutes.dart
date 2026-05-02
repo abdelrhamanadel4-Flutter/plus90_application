@@ -7,4 +7,5 @@ class Approutes {
   static const String Choosetype = 'Choosetype';
   static const String Home = 'Home';
   static const String HomeScreen = 'HomeScreen';
+  static const String HomescreanStore = 'HomescreanStore';
 }

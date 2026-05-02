@@ -3,10 +3,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:plus90_application/Auth/auth.dart';
-import 'package:plus90_application/Auth/choosetype.dart';
 import 'package:plus90_application/Auth/login.dart';
 import 'package:plus90_application/Auth/registers.dart';
-import 'package:plus90_application/Home/homeScrean.dart';
+import 'package:plus90_application/Home/store/homeScrean_store.dart';
+import 'package:plus90_application/Home/user/homeScrean.dart';
 import 'package:plus90_application/Splach/splachScrean.dart';
 import 'package:plus90_application/firebase_options.dart';
 import 'package:plus90_application/onBorading/onboradingpages.dart';
@@ -15,10 +15,12 @@ import 'package:plus90_application/utils/app.theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  GoogleFonts.config.allowRuntimeFetching = true;
-  runApp(MyApp());
+
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await FirebaseFirestore.instance.disableNetwork();
+
+  GoogleFonts.config.allowRuntimeFetching = true;
+
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -28,7 +30,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: Approutes.splach,
+      initialRoute: Approutes.HomeScreen,
       theme: Apptheme.darktheme,
       themeMode: ThemeMode.dark,
       routes: {
@@ -37,8 +39,8 @@ class MyApp extends StatelessWidget {
         Approutes.auth: (context) => (Auth()),
         Approutes.login: (context) => (Login()),
         Approutes.registers: (context) => (Registers()),
-        Approutes.Choosetype: (context) => (Choosetype()),
         Approutes.HomeScreen: (context) => (HomeScreen()),
+        Approutes.HomescreanStore: (context) => (HomescreanStore()),
       },
     );
   }

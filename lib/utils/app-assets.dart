@@ -16,4 +16,10 @@ class AppAssets {
   static const String search = 'assets/images/search.png';
   static const String cart = 'assets/images/cart.png';
   static const String profile = 'assets/images/user.png';
+  static const String header_cart = 'assets/images/header_cart.png';
+  static const String logo = 'assets/images/logo.png';
+  static const String clock = 'assets/images/clock.png';
+  static const String Button = 'assets/images/Button-.png';
+  static const String Button2 = 'assets/images/Button+.png';
+  static const String icon_search = 'assets/images/Frame.png';
 }

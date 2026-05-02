@@ -44,26 +44,30 @@ class _OnboradingpagesState extends State<Onboradingpages> {
             },
             children: [
               Onboradingscrean(
-                title: 'Shop Smart, Save More',
-                text: 'Discover exclusive last-minute deals near you.',
+                title: 'Rescue, Don’t Waste',
+                text:
+                    'Join a community dedicated to saving the planet. Rescue near-expiry products and reduce food waste one deal at a time.',
                 image: AppAssets.onborading1,
                 controller: controller,
               ),
               Onboradingscrean(
-                title: 'Deals Around You',
-                text: 'Find offers nearby with real-time location tracking.',
+                title: 'Smart Deals, Near You',
+                text:
+                    'Turn on your Radar to find incredible discounts of up to 70% on groceries, snacks, and tickets in your neighborhood.',
                 image: AppAssets.onborading2,
                 controller: controller,
               ),
               Onboradingscrean(
-                title: 'Limited Time Deals',
-                text: 'Grab exclusive offers before they expire.',
+                title: 'Sell Faster, Earn Smarter',
+                text:
+                    'Have items you don’t need? Or stock that needs to move? List your products in seconds and reach buyers instantly.',
                 image: AppAssets.onborading3,
                 controller: controller,
               ),
               Onboradingscrean(
-                title: 'Fast & Easy Pickup',
-                text: 'Grab your deal before it’s gone.',
+                title: 'Your Journey Starts Here',
+                text:
+                    'Ready to shop smart and sell easy? Join Sahlha today and discover the best deals around you.',
                 image: AppAssets.onborading4,
                 controller: controller,
               ),

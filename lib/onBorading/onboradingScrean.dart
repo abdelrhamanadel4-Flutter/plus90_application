@@ -25,7 +25,7 @@ class Onboradingscrean extends StatelessWidget {
         ),
         child: Padding(
           padding: EdgeInsets.only(
-            bottom: height(context) * 0.12,
+            bottom: height(context) * 0.07,
             left: width(context) * 0.05,
           ),
           child: Column(
@@ -36,7 +36,7 @@ class Onboradingscrean extends StatelessWidget {
                 title,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.rammettoOne(
-                  fontSize: 23,
+                  fontSize: 22,
                   color: Colors.white,
                 ),
               ),
@@ -44,7 +44,11 @@ class Onboradingscrean extends StatelessWidget {
               Text(
                 textAlign: TextAlign.center,
                 text,
-                style: GoogleFonts.ramaraja(color: Colors.white, fontSize: 12),
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w200,
+                ),
               ),
               SizedBox(height: height(context) * 0.04),
 

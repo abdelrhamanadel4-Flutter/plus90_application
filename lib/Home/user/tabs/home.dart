@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:plus90_application/screens/scan_screen.dart';
 import 'package:plus90_application/screens/sell_screen.dart';
 import 'package:plus90_application/screens/notification_screen.dart';
+import 'package:plus90_application/utils/app-assets.dart';
 import 'package:plus90_application/utils/app_color.dart';
+import 'package:plus90_application/utils/app_style.dart';
+import 'package:plus90_application/utils/custom_text_from.dart';
 
 class HomeUI extends StatefulWidget {
   const HomeUI({super.key});
@@ -15,7 +18,8 @@ class HomeUI extends StatefulWidget {
 class _HomeUIState extends State<HomeUI> {
   late final PageController _controller;
   int _currentPage = 1;
-
+  height(context) => MediaQuery.of(context).size.height;
+  width(context) => MediaQuery.of(context).size.width;
   late final List<Widget> banners;
 
   @override
@@ -184,20 +188,19 @@ class _HomeUIState extends State<HomeUI> {
                 const SizedBox(height: 15),
 
                 // Search
-                TextField(
-                  decoration: InputDecoration(
-                    hintText: "Search deals, restaurants, activities...",
-                    prefixIcon: const Icon(
-                      Icons.search_outlined,
-                      color: Color(0xFF861E43),
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: const BorderSide(color: Color(0xFF861E43)),
-                    ),
+                CustomTextFormField(
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: width(context) * 0.04,
+                    vertical: height(context) * 0.02,
                   ),
+                  hint: 'Search deals, restaurants, activities...',
+                  hintStyle: AppStyle.medium14ramdi,
+                  prefixIcon: Image.asset(
+                    AppAssets.icon_search,
+                    height: height(context) * 0.007,
+                  ),
+                  borderColor: AppColor.grayColor,
+                  fillColor: AppColor.whiteColor,
                 ),
 
                 const SizedBox(height: 15),

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:plus90_application/Home/tabs/cart.dart';
-import 'package:plus90_application/Home/tabs/home.dart';
-import 'package:plus90_application/Home/tabs/profile.dart';
-import 'package:plus90_application/Home/tabs/serach.dart';
+import 'package:plus90_application/Home/user/tabs/cart/cart.dart';
+import 'package:plus90_application/Home/user/tabs/home.dart';
+import 'package:plus90_application/Home/user/tabs/profile.dart';
+import 'package:plus90_application/Home/user/tabs/serach.dart';
 import 'package:plus90_application/utils/app-assets.dart';
 import 'package:plus90_application/utils/app_color.dart';
 

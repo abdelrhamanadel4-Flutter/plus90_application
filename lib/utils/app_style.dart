@@ -30,6 +30,11 @@ class AppStyle {
     color: AppColor.blackColor,
     fontWeight: FontWeight.bold,
   );
+  static final TextStyle bold20black = GoogleFonts.poppins(
+    fontSize: 20,
+    color: AppColor.blackColor,
+    fontWeight: FontWeight.bold,
+  );
   static final TextStyle bold24black = GoogleFonts.poppins(
     fontSize: 24,
     color: AppColor.blackColor,
@@ -45,6 +50,7 @@ class AppStyle {
     color: AppColor.orange,
     fontWeight: FontWeight.w600,
   );
+
   static final TextStyle semibold14black = GoogleFonts.poppins(
     fontSize: 14,
     color: AppColor.blackColor,
@@ -55,6 +61,26 @@ class AppStyle {
     color: AppColor.orange,
     fontWeight: FontWeight.w300,
   );
+  static final TextStyle bold20orange = GoogleFonts.poppins(
+    fontSize: 20,
+    color: AppColor.orange,
+    fontWeight: FontWeight.bold,
+  );
+  static final TextStyle bold18orange = GoogleFonts.poppins(
+    fontSize: 18,
+    color: AppColor.orange,
+    fontWeight: FontWeight.bold,
+  );
+  static final TextStyle bold12orange = GoogleFonts.poppins(
+    fontSize: 12,
+    color: AppColor.orange,
+    fontWeight: FontWeight.bold,
+  );
+  static final TextStyle bold12white = GoogleFonts.poppins(
+    fontSize: 12,
+    color: AppColor.whiteColor,
+    fontWeight: FontWeight.bold,
+  );
   static final TextStyle medium14orange = GoogleFonts.poppins(
     fontSize: 14,
     color: AppColor.orange,
@@ -62,6 +88,11 @@ class AppStyle {
   );
   static final TextStyle medium11ramdi = GoogleFonts.poppins(
     fontSize: 11,
+    color: Color(0XFF6B6B6B),
+    fontWeight: FontWeight.w400,
+  );
+  static final TextStyle medium14ramdi = GoogleFonts.poppins(
+    fontSize: 14,
     color: Color(0XFF6B6B6B),
     fontWeight: FontWeight.w400,
   );
