@@ -8,4 +8,7 @@ class Approutes {
   static const String Home = 'Home';
   static const String HomeScreen = 'HomeScreen';
   static const String HomescreanStore = 'HomescreanStore';
+  static const String DeatilsScrean = 'DeatilsScrean';
+  static const String Myorders = 'Myorders';
+  static const String Categories = 'Categories';
 }

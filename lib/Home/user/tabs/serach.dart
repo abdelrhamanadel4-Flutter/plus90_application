@@ -1,13 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:plus90_application/Home/card_item.dart';
+import 'package:plus90_application/utils/AppRoutes.dart';
+import 'package:plus90_application/utils/Dialog_utils.dart';
 import 'package:plus90_application/utils/app-assets.dart';
 import 'package:plus90_application/utils/app_color.dart';
 import 'package:plus90_application/utils/app_style.dart';
 import 'package:plus90_application/utils/custom_text_from.dart';
 
-class SearchTab extends StatelessWidget {
-  const SearchTab({super.key});
+class SearchTab extends StatefulWidget {
+  SearchTab({super.key});
+
+  @override
+  State<SearchTab> createState() => _SearchTabState();
+}
+
+class _SearchTabState extends State<SearchTab> {
   height(context) => MediaQuery.of(context).size.height;
+
   width(context) => MediaQuery.of(context).size.width;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,6 +28,7 @@ class SearchTab extends StatelessWidget {
           vertical: height(context) * 0.07,
         ),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             CustomTextFormField(
               contentPadding: EdgeInsets.symmetric(
@@ -32,16 +44,17 @@ class SearchTab extends StatelessWidget {
               borderColor: AppColor.grayColor,
               fillColor: AppColor.whiteColor,
             ),
-            SizedBox(height: height(context) * 0.3),
-            Text(
-              'No products found',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
-            ),
-            SizedBox(height: height(context) * 0.01),
-            Text(
-              'Try adjusting your search or filter to find what you are looking for.',
-              style: TextStyle(fontSize: 14, color: Colors.grey),
-              textAlign: TextAlign.center,
+
+            Expanded(
+              child: ListView.builder(
+                itemBuilder: (context, index) => Padding(
+                  padding: EdgeInsets.symmetric(
+                    vertical: width(context) * 0.015,
+                  ),
+                  child: CardItem(),
+                ),
+                itemCount: 3,
+              ),
             ),
           ],
         ),

@@ -22,4 +22,6 @@ class AppAssets {
   static const String Button = 'assets/images/Button-.png';
   static const String Button2 = 'assets/images/Button+.png';
   static const String icon_search = 'assets/images/Frame.png';
+  static const String donut = 'assets/images/donut.png';
+  static const String catgoryappbar = 'assets/images/catgoryappbar.png';
 }

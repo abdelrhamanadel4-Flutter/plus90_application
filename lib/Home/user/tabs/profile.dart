@@ -1,21 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:plus90_application/Auth/auth.dart';
+import 'package:plus90_application/screens/Favdeals.dart';
+import 'package:plus90_application/screens/myorders.dart';
 import 'package:plus90_application/screens/support_screen.dart';
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: ProfileTab(),
-    );
-  }
-}
+import 'package:plus90_application/utils/AppRoutes.dart';
 
 class ProfileTab extends StatelessWidget {
   const ProfileTab({super.key});
@@ -120,8 +108,18 @@ class ProfileTab extends StatelessWidget {
               const SizedBox(height: 15),
 
               /// Menu Items
-              _menuItem(context, Icons.receipt, "My Orders", () {}),
-              _menuItem(context, Icons.bookmark, "Saved Deals", () {}),
+              _menuItem(context, Icons.receipt, "My Orders", () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Myorders()),
+                );
+              }),
+              _menuItem(context, Icons.bookmark, "Fav Deals", () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Favdeals()),
+                );
+              }),
               _menuItem(context, Icons.headset_mic, "Support Center", () {
                 Navigator.push(
                   context,
@@ -134,19 +132,27 @@ class ProfileTab extends StatelessWidget {
               const Spacer(),
 
               /// Logout
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 18),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Row(
-                  children: [
-                    SizedBox(width: 15),
-                    Icon(Icons.logout, color: Colors.red),
-                    SizedBox(width: 10),
-                    Text("Log Out", style: TextStyle(color: Colors.red)),
-                  ],
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const Auth()),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 18),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Row(
+                    children: [
+                      SizedBox(width: 15),
+                      Icon(Icons.logout, color: Colors.red),
+                      SizedBox(width: 10),
+                      Text("Log Out", style: TextStyle(color: Colors.red)),
+                    ],
+                  ),
                 ),
               ),
 

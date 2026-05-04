@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,6 +9,9 @@ import 'package:plus90_application/Home/user/homeScrean.dart';
 import 'package:plus90_application/Splach/splachScrean.dart';
 import 'package:plus90_application/firebase_options.dart';
 import 'package:plus90_application/onBorading/onboradingpages.dart';
+import 'package:plus90_application/screens/catgory.dart';
+import 'package:plus90_application/screens/deatils_scean.dart';
+import 'package:plus90_application/screens/myorders.dart';
 import 'package:plus90_application/utils/AppRoutes.dart';
 import 'package:plus90_application/utils/app.theme.dart';
 
@@ -41,6 +43,9 @@ class MyApp extends StatelessWidget {
         Approutes.registers: (context) => (Registers()),
         Approutes.HomeScreen: (context) => (HomeScreen()),
         Approutes.HomescreanStore: (context) => (HomescreanStore()),
+        Approutes.DeatilsScrean: (context) => (DeatilsScrean()),
+        Approutes.Myorders: (context) => (Myorders()),
+        Approutes.Categories: (context) => (Categories()),
       },
     );
   }

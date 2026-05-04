@@ -81,6 +81,17 @@ class AppStyle {
     color: AppColor.whiteColor,
     fontWeight: FontWeight.bold,
   );
+  static final TextStyle bold16white = GoogleFonts.poppins(
+    fontSize: 16,
+    color: AppColor.whiteColor,
+    fontWeight: FontWeight.bold,
+  );
+
+  static final TextStyle medium14white = GoogleFonts.poppins(
+    fontSize: 14,
+    color: AppColor.whiteColor,
+    fontWeight: FontWeight.w400,
+  );
   static final TextStyle medium14orange = GoogleFonts.poppins(
     fontSize: 14,
     color: AppColor.orange,

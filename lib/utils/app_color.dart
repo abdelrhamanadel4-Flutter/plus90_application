@@ -7,4 +7,5 @@ class AppColor {
   static const Color offwhite = Color(0xffF6F2EB);
   static const Color grayColor = Color.fromRGBO(151, 182, 177, 0.25);
   static const Color grayColor2 = Color(0xff9DB2CE);
+  static const Color grayColor3 = Color(0xffDEE2DC);
 }

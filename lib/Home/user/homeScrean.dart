@@ -21,53 +21,70 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Scaffold(
-        body: _pages[_selectedIndex],
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _selectedIndex,
-          onTap: (index) {
-            setState(() => _selectedIndex = index);
-          },
-          type: BottomNavigationBarType.fixed,
-          items: [
-            BottomNavigationBarItem(
-              icon: Image.asset(
-                AppAssets.home,
-                color: _selectedIndex == 0
-                    ? AppColor.orange
-                    : AppColor.grayColor2,
-              ),
-              label: "Home",
-            ),
-            BottomNavigationBarItem(
-              icon: Image.asset(
-                AppAssets.search,
-                color: _selectedIndex == 1
-                    ? AppColor.orange
-                    : AppColor.grayColor2,
-              ),
-              label: "Search",
-            ),
-            BottomNavigationBarItem(
-              icon: Image.asset(
-                AppAssets.cart,
-                color: _selectedIndex == 2
-                    ? AppColor.orange
-                    : AppColor.grayColor2,
-              ),
-              label: "Cart",
-            ),
-            BottomNavigationBarItem(
-              icon: Image.asset(
-                AppAssets.profile,
-                color: _selectedIndex == 3
-                    ? AppColor.orange
-                    : AppColor.grayColor2,
-              ),
-              label: "Profile",
-            ),
-          ],
+      floatingActionButton: Container(
+        height: 60,
+        width: 70,
+        decoration: const BoxDecoration(
+          shape: BoxShape.circle,
+          color: AppColor.orange,
         ),
+        child: FloatingActionButton(
+          onPressed: () {},
+          backgroundColor: AppColor.orange,
+          elevation: 0,
+          shape: const CircleBorder(),
+          child: const Icon(Icons.store, color: Colors.white, size: 32),
+        ),
+      ),
+
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      body: _pages[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: AppColor.offwhite,
+        currentIndex: _selectedIndex,
+        onTap: (index) {
+          setState(() => _selectedIndex = index);
+        },
+        type: BottomNavigationBarType.fixed,
+
+        items: [
+          BottomNavigationBarItem(
+            icon: Image.asset(
+              AppAssets.home,
+              color: _selectedIndex == 0
+                  ? AppColor.orange
+                  : AppColor.grayColor2,
+            ),
+            label: "Home",
+          ),
+          BottomNavigationBarItem(
+            icon: Image.asset(
+              AppAssets.search,
+              color: _selectedIndex == 1
+                  ? AppColor.orange
+                  : AppColor.grayColor2,
+            ),
+            label: "Search",
+          ),
+          BottomNavigationBarItem(
+            icon: Image.asset(
+              AppAssets.cart,
+              color: _selectedIndex == 2
+                  ? AppColor.orange
+                  : AppColor.grayColor2,
+            ),
+            label: "Cart",
+          ),
+          BottomNavigationBarItem(
+            icon: Image.asset(
+              AppAssets.profile,
+              color: _selectedIndex == 3
+                  ? AppColor.orange
+                  : AppColor.grayColor2,
+            ),
+            label: "Profile",
+          ),
+        ],
       ),
     );
   }
