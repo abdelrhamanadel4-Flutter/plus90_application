@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: Approutes.HomeScreen,
+      initialRoute: Approutes.splach,
       theme: Apptheme.darktheme,
       themeMode: ThemeMode.dark,
       routes: {
