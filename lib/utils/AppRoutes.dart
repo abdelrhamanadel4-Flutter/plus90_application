@@ -11,4 +11,6 @@ class Approutes {
   static const String DeatilsScrean = 'DeatilsScrean';
   static const String Myorders = 'Myorders';
   static const String Categories = 'Categories';
+  static const String SellScreen = 'SellScreen';
+  static const String OrderConfirmed = 'OrderConfirmed';
 }

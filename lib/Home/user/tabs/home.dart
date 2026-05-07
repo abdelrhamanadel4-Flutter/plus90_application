@@ -79,66 +79,6 @@ class _HomeUIState extends State<HomeUI> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 55.0),
-
-        child: Material(
-          color: Colors.transparent,
-
-          child: InkWell(
-            borderRadius: BorderRadius.circular(16),
-
-            onTap: () {
-              Navigator.of(
-                context,
-              ).push(MaterialPageRoute(builder: (_) => const SellScreen()));
-            },
-
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-
-              decoration: BoxDecoration(
-                color: const Color(0xFF861E43),
-
-                borderRadius: BorderRadius.circular(16),
-
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-
-                    blurRadius: 10,
-
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-
-                children: [
-                  Icon(Icons.crop_free, color: Colors.white, size: 20),
-
-                  SizedBox(width: 8),
-
-                  Text(
-                    "Sell Now",
-
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -524,19 +464,16 @@ class _HomeUIState extends State<HomeUI> {
 
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               ),
-
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,
                   vertical: 5,
                 ),
-
                 decoration: BoxDecoration(
                   color: const Color(0xFFFFE0D6),
 
                   borderRadius: BorderRadius.circular(20),
                 ),
-
                 child: const Text(
                   "-40%",
 
@@ -548,7 +485,6 @@ class _HomeUIState extends State<HomeUI> {
               ),
             ],
           ),
-
           const SizedBox(height: 5),
 
           const Text(
@@ -556,9 +492,7 @@ class _HomeUIState extends State<HomeUI> {
 
             style: TextStyle(color: Colors.grey, fontSize: 12),
           ),
-
           const SizedBox(height: 8),
-
           Row(
             children: const [
               Text(
