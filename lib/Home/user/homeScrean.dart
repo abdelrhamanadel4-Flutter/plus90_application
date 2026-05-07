@@ -5,6 +5,7 @@ import 'package:plus90_application/Home/user/tabs/profile.dart';
 import 'package:plus90_application/Home/user/tabs/serach.dart';
 import 'package:plus90_application/utils/app-assets.dart';
 import 'package:plus90_application/utils/app_color.dart';
+import 'package:plus90_application/screens/sell_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -29,7 +30,12 @@ class _HomeScreenState extends State<HomeScreen> {
           color: AppColor.orange,
         ),
         child: FloatingActionButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const SellScreen()),
+            );
+          },
           backgroundColor: AppColor.orange,
           elevation: 0,
           shape: const CircleBorder(),

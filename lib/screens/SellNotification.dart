@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class NotificationsScreen extends StatelessWidget {
-  const NotificationsScreen({super.key});
+class Sellnotification extends StatelessWidget {
+  const Sellnotification({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +93,7 @@ class NotificationsScreen extends StatelessWidget {
 
                         children: [
                           Text(
-                            "Order placed",
+                            "New Deal Published",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 15,
@@ -103,7 +103,7 @@ class NotificationsScreen extends StatelessWidget {
                           SizedBox(height: 4),
 
                           Text(
-                            "Your order has been successfully placed.",
+                            "Your deal has been successfully published.",
                             style: TextStyle(color: Colors.grey, fontSize: 13),
                           ),
                         ],

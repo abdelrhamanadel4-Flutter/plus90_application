@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:plus90_application/screens/IncomingOrder.dart';
 import 'package:plus90_application/screens/AddItem.dart';
 import 'package:plus90_application/screens/MyItems.dart';
+import 'package:plus90_application/screens/SellNotification.dart';
+import 'package:plus90_application/screens/SellNotification.dart';
 
 class SellScreen extends StatefulWidget {
   const SellScreen({super.key});
@@ -30,13 +32,23 @@ class _SellScreenState extends State<SellScreen> {
               child: Row(
                 children: [
                   /// 🔙 BACK BUTTON
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
+                  CircleAvatar(
+                    radius: 22,
+                    backgroundColor: Colors.white,
 
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.arrow_back_ios_new,
+                        color: Colors.black,
+                        size: 18,
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  const SizedBox(width: 16),
                   const CircleAvatar(radius: 22),
                   const SizedBox(width: 10),
 
@@ -52,7 +64,40 @@ class _SellScreenState extends State<SellScreen> {
                   const Spacer(),
 
                   /// 🔔 NOTIFICATION
-                  const Icon(Icons.notifications_none),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const Sellnotification(),
+                        ),
+                      );
+                    },
+
+                    child: Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.08),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+
+                      child: const Center(
+                        child: Icon(
+                          Icons.notifications_none,
+                          color: Color(0xFF8B1E3F),
+                          size: 26,
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -60,46 +105,52 @@ class _SellScreenState extends State<SellScreen> {
             /// 🟪 TABS (ثابتة)
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 16),
-              padding: const EdgeInsets.all(5),
+              padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
-                border: Border.all(color: Color(0xFF8B1E3F)),
+                border: Border.all(color: const Color(0xFF8B1E3F)),
               ),
-              child: Row(
-                children: List.generate(tabs.length, (index) {
-                  return Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          selectedIndex = index;
-                        });
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        decoration: BoxDecoration(
-                          color: selectedIndex == index
-                              ? Color(0xFF8B1E3F)
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+              child: SizedBox(
+                height: 50,
+                child: Row(
+                  children: List.generate(tabs.length, (index) {
+                    return Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            selectedIndex = index;
+                          });
+                        },
                         child: Center(
-                          child: Text(
-                            tabs[index],
-                            style: TextStyle(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 8,
+                              horizontal: 25,
+                            ), // 👈 المربع البنفسجي أصغر
+                            decoration: BoxDecoration(
                               color: selectedIndex == index
-                                  ? Colors.white
-                                  : Color(0xFF8B1E3F),
-                              fontSize: 12,
+                                  ? const Color(0xFF8B1E3F)
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              tabs[index],
+                              style: TextStyle(
+                                fontSize: 12, // 👈 الخط أكبر
+                                fontWeight: FontWeight.w600,
+                                color: selectedIndex == index
+                                    ? Colors.white
+                                    : const Color(0xFF8B1E3F),
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  );
-                }),
+                    );
+                  }),
+                ),
               ),
             ),
-
             const SizedBox(height: 15),
 
             /// 📄 CONTENT (اللي بيتغير)
