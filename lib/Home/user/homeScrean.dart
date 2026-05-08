@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_floating_bottom_bar/flutter_floating_bottom_bar.dart';
+
 import 'package:plus90_application/Home/user/tabs/cart/cart.dart';
 import 'package:plus90_application/Home/user/tabs/home.dart';
 import 'package:plus90_application/Home/user/tabs/profile.dart';
-import 'package:plus90_application/Home/user/tabs/serach.dart';
+import 'package:plus90_application/screens/catgory.dart';
+import 'package:plus90_application/utils/AppRoutes.dart';
 import 'package:plus90_application/utils/app-assets.dart';
 import 'package:plus90_application/utils/app_color.dart';
-import 'package:plus90_application/screens/sell_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,81 +16,147 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0;
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController tabController;
 
-  List<Widget> _pages = [HomeUI(), SearchTab(), CartTab(), ProfileTab()];
+  final List<Widget> pages = [HomeUI(), Categories(), CartTab(), ProfileTab()];
+
+  @override
+  void initState() {
+    super.initState();
+
+    tabController = TabController(length: 4, vsync: this);
+
+    tabController.addListener(() {
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: Container(
-        height: 60,
-        width: 70,
-        decoration: const BoxDecoration(
-          shape: BoxShape.circle,
-          color: AppColor.orange,
+      extendBody: true,
+
+      body: BottomBar(
+        layout: BottomBarLayout(
+          width: MediaQuery.of(context).size.width * 0.88,
+          borderRadius: BorderRadius.circular(35),
         ),
-        child: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const SellScreen()),
-            );
-          },
-          backgroundColor: AppColor.orange,
-          elevation: 0,
-          shape: const CircleBorder(),
-          child: const Icon(Icons.store, color: Colors.white, size: 32),
+
+        body: TabBarView(
+          controller: tabController,
+          physics: const NeverScrollableScrollPhysics(),
+          children: pages,
+        ),
+
+        child: Container(
+          height: 72,
+
+          decoration: BoxDecoration(
+            color: AppColor.orange,
+            borderRadius: BorderRadius.circular(35),
+          ),
+
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+
+            children: [
+              /// home
+              navItem(index: 0, image: AppAssets.home),
+
+              /// search
+              navItem(index: 1, image: AppAssets.search),
+
+              /// center button
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(context, Approutes.SellScreen);
+
+                  /// action
+                },
+
+                child: Transform.translate(
+                  offset: const Offset(0, -18),
+
+                  child: Container(
+                    height: 60,
+                    width: 60,
+
+                    decoration: BoxDecoration(
+                      color: AppColor.orange,
+                      shape: BoxShape.circle,
+
+                      border: Border.all(color: Colors.white, width: 5),
+
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 10,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
+                    ),
+
+                    child: const Icon(
+                      Icons.store,
+                      color: Colors.white,
+                      size: 28,
+                    ),
+                  ),
+                ),
+              ),
+
+              /// cart
+              navItem(index: 2, image: AppAssets.cart),
+
+              /// profile
+              navItem(index: 3, image: AppAssets.profile),
+            ],
+          ),
         ),
       ),
+    );
+  }
 
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: AppColor.offwhite,
-        currentIndex: _selectedIndex,
-        onTap: (index) {
-          setState(() => _selectedIndex = index);
-        },
-        type: BottomNavigationBarType.fixed,
+  Widget navItem({required int index, required String image}) {
+    final bool isSelected = tabController.index == index;
 
-        items: [
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              AppAssets.home,
-              color: _selectedIndex == 0
-                  ? AppColor.orange
-                  : AppColor.grayColor2,
-            ),
-            label: "Home",
+    return GestureDetector(
+      onTap: () {
+        tabController.animateTo(index);
+      },
+
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+
+        children: [
+          Image.asset(
+            image,
+            height: 24,
+            width: 24,
+            color: isSelected ? AppColor.offwhite : Color(0xFFE5C7D1),
           ),
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              AppAssets.search,
-              color: _selectedIndex == 1
-                  ? AppColor.orange
-                  : AppColor.grayColor2,
+
+          const SizedBox(height: 6),
+
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+
+            height: 3,
+
+            width: isSelected ? 20 : 0,
+
+            decoration: BoxDecoration(
+              color: AppColor.whiteColor,
+              borderRadius: BorderRadius.circular(20),
             ),
-            label: "Search",
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              AppAssets.cart,
-              color: _selectedIndex == 2
-                  ? AppColor.orange
-                  : AppColor.grayColor2,
-            ),
-            label: "Cart",
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              AppAssets.profile,
-              color: _selectedIndex == 3
-                  ? AppColor.orange
-                  : AppColor.grayColor2,
-            ),
-            label: "Profile",
           ),
         ],
       ),

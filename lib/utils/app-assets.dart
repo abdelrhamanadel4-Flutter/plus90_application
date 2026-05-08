@@ -24,4 +24,7 @@ class AppAssets {
   static const String icon_search = 'assets/images/Frame.png';
   static const String donut = 'assets/images/donut.png';
   static const String catgoryappbar = 'assets/images/catgoryappbar.png';
+  static const String orderconfirmed = 'assets/images/orderconfirmed.png';
+  static const String myitems = 'assets/images/myitem.png';
+  static const String edit = 'assets/images/edit.png';
 }

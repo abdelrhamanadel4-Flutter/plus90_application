@@ -6,12 +6,14 @@ import 'package:plus90_application/Auth/login.dart';
 import 'package:plus90_application/Auth/registers.dart';
 import 'package:plus90_application/Home/store/homeScrean_store.dart';
 import 'package:plus90_application/Home/user/homeScrean.dart';
+import 'package:plus90_application/Home/user/tabs/cart/orderconfirmed.dart';
 import 'package:plus90_application/Splach/splachScrean.dart';
 import 'package:plus90_application/firebase_options.dart';
 import 'package:plus90_application/onBorading/onboradingpages.dart';
 import 'package:plus90_application/screens/catgory.dart';
 import 'package:plus90_application/screens/deatils_scean.dart';
 import 'package:plus90_application/screens/myorders.dart';
+import 'package:plus90_application/screens/sell_screen.dart';
 import 'package:plus90_application/utils/AppRoutes.dart';
 import 'package:plus90_application/utils/app.theme.dart';
 
@@ -46,6 +48,8 @@ class MyApp extends StatelessWidget {
         Approutes.DeatilsScrean: (context) => (DeatilsScrean()),
         Approutes.Myorders: (context) => (Myorders()),
         Approutes.Categories: (context) => (Categories()),
+        Approutes.orderconfirmed: (context) => (OrderConfirmed()),
+        Approutes.SellScreen: (context) => (SellScreen()),
       },
     );
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:plus90_application/screens/IncomingOrder.dart';
+import 'package:plus90_application/screens/incomingorder/IncomingOrder.dart';
 import 'package:plus90_application/screens/AddItem.dart';
-import 'package:plus90_application/screens/MyItems.dart';
+import 'package:plus90_application/screens/myitem/MyItems.dart';
 import 'package:plus90_application/screens/SellNotification.dart';
 import 'package:plus90_application/screens/SellNotification.dart';
 
@@ -21,8 +21,6 @@ class _SellScreenState extends State<SellScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffF6F6F6),
-
       body: SafeArea(
         child: Column(
           children: [

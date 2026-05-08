@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:plus90_application/Home/user/tabs/cart/card_cart.dart';
+import 'package:plus90_application/utils/AppRoutes.dart';
 import 'package:plus90_application/utils/app-assets.dart';
 import 'package:plus90_application/utils/app_style.dart';
 import 'package:plus90_application/utils/custom-elveted-buttom.dart';
@@ -85,11 +86,13 @@ class CartTab extends StatelessWidget {
               ),
               SizedBox(height: height(context) * 0.03),
               CustomElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pushNamed(context, Approutes.orderconfirmed);
+                },
                 text: 'Checkout',
                 textStyle: AppStyle.semibold20white,
               ),
-              SizedBox(height: height(context) * 0.02),
+              SizedBox(height: height(context) * 0.1),
             ],
           ),
         ),

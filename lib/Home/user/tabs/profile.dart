@@ -5,6 +5,7 @@ import 'package:plus90_application/screens/myorders.dart';
 import 'package:plus90_application/screens/support_screen.dart';
 import 'package:plus90_application/utils/AppRoutes.dart';
 import 'package:plus90_application/screens/EditProfile.dart';
+import 'package:plus90_application/utils/app_color.dart';
 
 class ProfileTab extends StatelessWidget {
   const ProfileTab({super.key});
@@ -140,8 +141,6 @@ class ProfileTab extends StatelessWidget {
                 );
               }),
 
-              const Spacer(),
-
               /// Logout
               GestureDetector(
                 onTap: () {
@@ -161,7 +160,7 @@ class ProfileTab extends StatelessWidget {
                             const Icon(
                               Icons.logout,
                               size: 50,
-                              color: Colors.red,
+                              color: AppColor.orange,
                             ),
                             const SizedBox(height: 10),
 
@@ -170,6 +169,7 @@ class ProfileTab extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 25,
                                 fontWeight: FontWeight.bold,
+                                color: AppColor.orange,
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -230,7 +230,10 @@ class ProfileTab extends StatelessWidget {
                                 onPressed: () {
                                   Navigator.pop(context);
                                 },
-                                child: const Text("Cancel"),
+                                child: const Text(
+                                  "Cancel",
+                                  style: TextStyle(color: AppColor.orange),
+                                ),
                               ),
                             ),
                           ],
@@ -248,9 +251,9 @@ class ProfileTab extends StatelessWidget {
                   child: const Row(
                     children: [
                       SizedBox(width: 15),
-                      Icon(Icons.logout, color: Colors.red),
+                      Icon(Icons.logout, color: AppColor.orange),
                       SizedBox(width: 10),
-                      Text("Log Out", style: TextStyle(color: Colors.red)),
+                      Text("Log Out", style: TextStyle(color: AppColor.orange)),
                     ],
                   ),
                 ),
@@ -341,5 +344,3 @@ class ProfileTab extends StatelessWidget {
     );
   }
 }
-
-/// Support Screen
