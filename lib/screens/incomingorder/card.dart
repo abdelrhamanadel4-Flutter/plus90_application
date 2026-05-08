@@ -26,7 +26,6 @@ class Cardincomingorder extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /// image + order info تحتها
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -45,7 +44,6 @@ class Cardincomingorder extends StatelessWidget {
 
                   SizedBox(height: height(context) * 0.01),
 
-                  /// order info تحت الصورة
                   SizedBox(
                     width: width(context) * 0.28,
                     child: Column(
@@ -109,7 +107,6 @@ class Cardincomingorder extends StatelessWidget {
 
                     SizedBox(height: height(context) * 0.015),
 
-                    /// right info فقط (Quantity, Payment, Pickup)
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [

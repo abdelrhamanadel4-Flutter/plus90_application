@@ -17,7 +17,7 @@ class CartTab extends StatelessWidget {
       child: Scaffold(
         body: Padding(
           padding: EdgeInsets.symmetric(
-            horizontal: width(context) * 0.07,
+            horizontal: width(context) * 0.05,
             vertical: height(context) * 0.02,
           ),
           child: ListView(
@@ -25,6 +25,14 @@ class CartTab extends StatelessWidget {
               /// 🔹 الهيدر
               Row(
                 children: [
+                  IconButton(
+                    icon: const Icon(
+                      Icons.arrow_back_ios_outlined,
+                      color: Colors.black,
+                    ),
+                    onPressed: () =>
+                        Navigator.pushNamed(context, Approutes.HomeScreen),
+                  ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

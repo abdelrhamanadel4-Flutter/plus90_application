@@ -13,4 +13,5 @@ class Approutes {
   static const String Categories = 'Categories';
   static const String orderconfirmed = 'orderconfirmed';
   static const String SellScreen = 'SellScreen';
+  static const String AddItem = 'AddItem';
 }

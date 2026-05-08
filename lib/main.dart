@@ -10,6 +10,7 @@ import 'package:plus90_application/Home/user/tabs/cart/orderconfirmed.dart';
 import 'package:plus90_application/Splach/splachScrean.dart';
 import 'package:plus90_application/firebase_options.dart';
 import 'package:plus90_application/onBorading/onboradingpages.dart';
+import 'package:plus90_application/screens/AddItem.dart';
 import 'package:plus90_application/screens/catgory.dart';
 import 'package:plus90_application/screens/deatils_scean.dart';
 import 'package:plus90_application/screens/myorders.dart';
@@ -50,6 +51,7 @@ class MyApp extends StatelessWidget {
         Approutes.Categories: (context) => (Categories()),
         Approutes.orderconfirmed: (context) => (OrderConfirmed()),
         Approutes.SellScreen: (context) => (SellScreen()),
+        Approutes.AddItem: (context) => (AddItem()),
       },
     );
   }

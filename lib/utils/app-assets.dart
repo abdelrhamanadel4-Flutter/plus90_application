@@ -27,4 +27,7 @@ class AppAssets {
   static const String orderconfirmed = 'assets/images/orderconfirmed.png';
   static const String myitems = 'assets/images/myitem.png';
   static const String edit = 'assets/images/edit.png';
+  static const String icon_homestore = 'assets/images/icon_homestor.png';
+  static const String incomingorder = 'assets/images/incomingorder.png';
+  static const String actrivemorder = 'assets/images/actrivemorder.png';
 }

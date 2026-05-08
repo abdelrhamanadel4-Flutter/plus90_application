@@ -1,18 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:plus90_application/Home/card_item.dart';
-import 'package:plus90_application/utils/AppRoutes.dart';
 import 'package:plus90_application/utils/app-assets.dart';
 import 'package:plus90_application/utils/app_color.dart';
 import 'package:plus90_application/utils/app_style.dart';
 import 'package:plus90_application/utils/custom-elveted-buttom.dart';
+import 'package:plus90_application/Home/user/tabs/cart/cart.dart';
 
 class DeatilsScrean extends StatelessWidget {
   const DeatilsScrean({super.key});
 
-  @override
-  height(context) => MediaQuery.of(context).size.height;
-
-  width(context) => MediaQuery.of(context).size.width;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,64 +21,72 @@ class DeatilsScrean extends StatelessWidget {
         ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Stack(
-            // crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Image.asset(
-                  AppAssets.donut,
-                  fit: BoxFit.contain,
-                  height: 280,
-                  width: 350,
-                ),
+        child: Column(
+          children: [
+            Center(
+              child: Image.asset(
+                AppAssets.donut,
+                height: 280,
+                fit: BoxFit.fill,
               ),
-              const SizedBox(height: 8),
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: AppColor.grayColor3,
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(25),
-                      topRight: Radius.circular(25),
-                    ),
+            ),
+
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: AppColor.grayColor3,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(50),
+                    topRight: Radius.circular(50),
                   ),
+                ),
+                child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text("Unicorn Sprinkles", style: AppStyle.bold18orange),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       Text(
                         "A fluffy fresh cooked donut covered by a creamy strawberry flavour with rainbow sprinkles.",
                         style: AppStyle.medium14orange,
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 20),
                       Row(
                         children: [
-                          Text(
-                            "Ends In",
+                          const Text(
+                            "Ends In ",
                             style: TextStyle(
                               color: Color(0xffD70000),
-                              fontSize: 20,
+                              fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(height: 10),
-                          Text('08:15:29', style: AppStyle.bold12orange),
-                          SizedBox(height: 10),
+                          const SizedBox(width: 16),
+                          Icon(
+                            Icons.timelapse_outlined,
+                            color: Color(0xffD70000),
+                          ),
+                          Text(
+                            '08:15:29',
+                            style: TextStyle(
+                              color: Color(0xffD70000),
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ],
                       ),
+                      const SizedBox(height: 15),
+
                       Row(
                         children: [
                           Text(
                             "78 EGP",
                             style: TextStyle(
                               fontSize: 24,
-                              fontWeight: FontWeight.w400,
+                              fontWeight: FontWeight.bold,
                               color: AppColor.orange,
                             ),
                           ),
@@ -91,8 +94,7 @@ class DeatilsScrean extends StatelessWidget {
                           Text(
                             "100 EGP",
                             style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w400,
+                              fontSize: 18,
                               color: Colors.grey,
                               decoration: TextDecoration.lineThrough,
                             ),
@@ -100,12 +102,12 @@ class DeatilsScrean extends StatelessWidget {
                           const SizedBox(width: 10),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 2,
+                              horizontal: 8,
+                              vertical: 4,
                             ),
                             decoration: BoxDecoration(
                               color: Colors.green.shade100,
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
                               "-12%",
@@ -117,91 +119,82 @@ class DeatilsScrean extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 20),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        padding: const EdgeInsets.all(15),
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Colors.grey.shade300),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColor.orange),
+                          color: AppColor.offwhite,
                         ),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
                               children: [
-                                CircleAvatar(
-                                  radius: 24,
+                                const CircleAvatar(
+                                  radius: 25,
                                   backgroundImage: AssetImage(AppAssets.donut),
                                 ),
                                 const SizedBox(width: 12),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: const [
-                                    Text(
-                                      "Shrouk Mohamed",
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
+                                const Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Shrouk Mohamed",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
-                                    ),
-                                    Text(
-                                      "Owner",
-                                      style: TextStyle(color: Colors.grey),
-                                    ),
-                                  ],
+                                      Text(
+                                        "Owner",
+                                        style: TextStyle(color: Colors.grey),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                                Spacer(),
-                                Icon(Icons.phone, color: Colors.pink),
-                                SizedBox(width: 8),
+                                IconButton(
+                                  onPressed: () {},
+                                  icon: const Icon(
+                                    Icons.phone,
+                                    color: Colors.pink,
+                                  ),
+                                ),
                                 Text("01123673905"),
                               ],
                             ),
-                            Container(
-                              width: 306,
-                              height: 0,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: AppColor.orange),
-                                color: AppColor.whiteColor,
-                              ),
-                            ),
+                            const Divider(height: 25),
                             Row(
                               children: [
-                                Icon(Icons.location_on, color: AppColor.orange),
-                                SizedBox(width: 8),
-                                Expanded(
+                                Icon(
+                                  Icons.location_on,
+                                  color: AppColor.orange,
+                                  size: 24,
+                                ),
+                                const SizedBox(width: 8),
+                                const Expanded(
                                   child: Text(
-                                    "Nasr City, Cairo, Egypt\nEl Tayaran St. - Beside City Stars Mall",
-                                    style: TextStyle(height: 1.3),
+                                    "Nasr City, Cairo, Egypt\nEl Tayaran St.",
+                                    style: TextStyle(fontSize: 12),
                                   ),
                                 ),
-                                InkWell(
-                                  onTap: () async {
-                                    // final url =
-                                    //     "https://www.google.com/maps/search/?api=1&query=Nasr+City+Cairo+Egypt";
-                                    // if (await canLaunchUrl(Uri.parse(url))) {
-                                    //   await launchUrl(Uri.parse(url),
-                                    //       mode: LaunchMode.externalApplication);
-                                    // }
-                                  },
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        "View on map",
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: AppColor.orange,
-                                          fontWeight: FontWeight.w200,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 4),
-                                      const Icon(
-                                        Icons.arrow_forward_ios,
-                                        size: 12,
-                                        color: AppColor.orange,
-                                      ),
-                                    ],
+                                TextButton(
+                                  onPressed: () {},
+                                  child: Text(
+                                    "View on map",
+                                    style: TextStyle(
+                                      color: AppColor.orange,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  onPressed: () {},
+                                  icon: const Icon(
+                                    Icons.arrow_forward_ios_outlined,
+                                    color: AppColor.orange,
                                   ),
                                 ),
                               ],
@@ -209,20 +202,37 @@ class DeatilsScrean extends StatelessWidget {
                           ],
                         ),
                       ),
-                      CustomElevatedButton(
-                        onPressed: () {},
-                        text: 'Add to cart',
-                        textStyle: AppStyle.semibold20white,
+
+                      const SizedBox(height: 20),
+                      Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: CustomElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const CartTab(),
+                                ),
+                              );
+                            },
+                            text: 'Add to cart',
+                            textStyle: AppStyle.semibold20white,
+                            hasSuffix: true,
+                            iconWidgetSuf: Icon(
+                              Icons.shopping_cart_outlined,
+                              color: AppColor.offwhite,
+                            ),
+                          ),
+                        ),
                       ),
-                      SizedBox(height: height(context) * 0.02),
                     ],
                   ),
                 ),
               ),
-
-              const SizedBox(height: 20),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
