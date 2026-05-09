@@ -4,9 +4,20 @@ import 'package:plus90_application/utils/app_color.dart';
 import 'package:plus90_application/utils/app_style.dart';
 import 'package:plus90_application/utils/custom-elveted-buttom.dart';
 import 'package:plus90_application/Home/user/tabs/cart/cart.dart';
+import 'package:plus90_application/utils/Dialog_utils.dart';
 
-class DeatilsScrean extends StatelessWidget {
-  const DeatilsScrean({super.key});
+class DeatilsScrean extends StatefulWidget {
+  @override
+  State<DeatilsScrean> createState() => _DeatilsScrean();
+}
+
+class _DeatilsScrean extends State<DeatilsScrean> {
+  height(context) => MediaQuery.of(context).size.height;
+
+  width(context) => MediaQuery.of(context).size.width;
+
+  bool isfav = false;
+
 
   @override
   Widget build(BuildContext context) {
@@ -46,8 +57,30 @@ class DeatilsScrean extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Unicorn Sprinkles", style: AppStyle.bold18orange),
-                      const SizedBox(height: 10),
+SizedBox(
+  width: double.infinity,
+  child: Row(
+    children: [
+       Text('Unicorn Sprinkles', style: AppStyle.bold18orange),
+       const Spacer(), 
+      IconButton(
+          onPressed: () {
+          setState(() {
+            isfav = !isfav;
+          });
+
+          DialogUtils.showMessage(
+            context: context,
+            message: isfav
+                ? "Added to favorites"
+                : "Remove from favorites",
+          );
+        },
+        icon: Icon(isfav ? Icons.favorite : Icons.favorite_border,color: isfav ? AppColor.orange :AppColor.orange ,size: 28,),
+      ),
+    ],
+  ),
+),
                       Text(
                         "A fluffy fresh cooked donut covered by a creamy strawberry flavour with rainbow sprinkles.",
                         style: AppStyle.medium14orange,
@@ -91,14 +124,7 @@ class DeatilsScrean extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 10),
-                          Text(
-                            "100 EGP",
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.grey,
-                              decoration: TextDecoration.lineThrough,
-                            ),
-                          ),
+                          Text("100 EGP",style: TextStyle(fontSize: 18,color: Colors.grey,decoration: TextDecoration.lineThrough,),),
                           const SizedBox(width: 10),
                           Container(
                             padding: const EdgeInsets.symmetric(
@@ -157,10 +183,7 @@ class DeatilsScrean extends StatelessWidget {
                                 ),
                                 IconButton(
                                   onPressed: () {},
-                                  icon: const Icon(
-                                    Icons.phone,
-                                    color: Colors.pink,
-                                  ),
+                                  icon: const Icon(Icons.phone,color: AppColor.orange),
                                 ),
                                 Text("01123673905"),
                               ],
@@ -168,35 +191,13 @@ class DeatilsScrean extends StatelessWidget {
                             const Divider(height: 25),
                             Row(
                               children: [
-                                Icon(
-                                  Icons.location_on,
-                                  color: AppColor.orange,
-                                  size: 24,
-                                ),
+                                Icon(Icons.location_on,color: AppColor.orange,size: 24,),
                                 const SizedBox(width: 8),
                                 const Expanded(
-                                  child: Text(
-                                    "Nasr City, Cairo, Egypt\nEl Tayaran St.",
-                                    style: TextStyle(fontSize: 12),
-                                  ),
+                                  child: Text("Nasr City, Cairo, Egypt\nEl Tayaran St.",style: TextStyle(fontSize: 12),),
                                 ),
-                                TextButton(
-                                  onPressed: () {},
-                                  child: Text(
-                                    "View on map",
-                                    style: TextStyle(
-                                      color: AppColor.orange,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ),
-                                IconButton(
-                                  onPressed: () {},
-                                  icon: const Icon(
-                                    Icons.arrow_forward_ios_outlined,
-                                    color: AppColor.orange,
-                                  ),
-                                ),
+                                 Text('View Details', style: AppStyle.medium14orange),
+                                  Icon(Icons.arrow_forward_ios,size: 14,color: AppColor.orange,),
                               ],
                             ),
                           ],
@@ -220,10 +221,7 @@ class DeatilsScrean extends StatelessWidget {
                             text: 'Add to cart',
                             textStyle: AppStyle.semibold20white,
                             hasSuffix: true,
-                            iconWidgetSuf: Icon(
-                              Icons.shopping_cart_outlined,
-                              color: AppColor.offwhite,
-                            ),
+                            iconWidgetSuf: Icon(Icons.shopping_cart_outlined,color: AppColor.offwhite,),
                           ),
                         ),
                       ),
