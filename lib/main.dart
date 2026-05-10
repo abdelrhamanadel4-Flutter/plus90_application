@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:plus90_application/Auth/ChooseLocationScreen.dart';
 import 'package:plus90_application/Auth/auth.dart';
 import 'package:plus90_application/Auth/login.dart';
 import 'package:plus90_application/Auth/registers.dart';
@@ -52,6 +53,7 @@ class MyApp extends StatelessWidget {
         Approutes.orderconfirmed: (context) => (OrderConfirmed()),
         Approutes.SellScreen: (context) => (SellScreen()),
         Approutes.AddItem: (context) => (AddItem()),
+        Approutes.ChooseLocationScreen: (context) => (ChooseLocationScreen()),
       },
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:plus90_application/Auth/auth.dart';
 import 'package:plus90_application/screens/Favdeals.dart';
 import 'package:plus90_application/screens/myorders.dart';
@@ -12,6 +13,8 @@ class ProfileTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F1EB),
       body: SafeArea(
@@ -119,25 +122,40 @@ class ProfileTab extends StatelessWidget {
 
               const SizedBox(height: 15),
 
-              /// Menu Items
+              /// Orders
               _menuItem(context, Icons.receipt, "My Orders", () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => Myorders()),
                 );
               }),
+
+              /// Fav Deals
               _menuItem(context, Icons.bookmark, "Fav Deals", () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => Favdeals()),
                 );
               }),
+
+              /// Support
               _menuItem(context, Icons.headset_mic, "Support Center", () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => const SupportScreen(),
                   ),
+                );
+              }),
+
+              /// ⭐ Location (NEW)
+              _menuItem(context, Icons.location_on, "Location", () {
+                if (user == null) return;
+
+                Navigator.pushNamed(
+                  context,
+                  Approutes.ChooseLocationScreen,
+                  arguments: user.uid,
                 );
               }),
 
@@ -151,93 +169,60 @@ class ProfileTab extends StatelessWidget {
                         borderRadius: BorderRadius.circular(25),
                       ),
                       contentPadding: const EdgeInsets.all(25),
-                      content: SizedBox(
-                        width: double.maxFinite,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.logout,
-                              size: 50,
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.logout,
+                            size: 50,
+                            color: AppColor.orange,
+                          ),
+                          const SizedBox(height: 10),
+                          const Text(
+                            "Log out",
+                            style: TextStyle(
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold,
                               color: AppColor.orange,
                             ),
-                            const SizedBox(height: 10),
+                          ),
+                          const SizedBox(height: 10),
+                          const Text(
+                            "Are you sure you want to log out?",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                          const SizedBox(height: 25),
 
-                            const Text(
-                              "Log out",
-                              style: TextStyle(
-                                fontSize: 25,
-                                fontWeight: FontWeight.bold,
-                                color: AppColor.orange,
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF8B1E3F),
                               ),
-                              textAlign: TextAlign.center,
-                            ),
-
-                            const SizedBox(height: 10),
-
-                            const Text(
-                              "Are you sure you want to log out?",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 14,
-                              ),
-                            ),
-
-                            const SizedBox(height: 25),
-
-                            /// Buttons (stacked)
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Color(0xFF8B1E3F),
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 14,
+                              onPressed: () {
+                                Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const Auth(),
                                   ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                onPressed: () {
-                                  Navigator.pushAndRemoveUntil(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const Auth(),
-                                    ),
-                                    (route) => false,
-                                  );
-                                },
-                                child: const Text("Log out"),
-                              ),
+                                  (route) => false,
+                                );
+                              },
+                              child: const Text("Log out"),
                             ),
+                          ),
 
-                            const SizedBox(height: 10),
+                          const SizedBox(height: 10),
 
-                            SizedBox(
-                              width: double.infinity,
-                              child: OutlinedButton(
-                                style: OutlinedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 14,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                child: const Text(
-                                  "Cancel",
-                                  style: TextStyle(color: AppColor.orange),
-                                ),
-                              ),
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text("Cancel"),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   );
@@ -278,32 +263,20 @@ class ProfileTab extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, size: 18),
-            ),
+            Icon(icon, size: 18),
             const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
-                  Text(
-                    value,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
-              ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+                Text(
+                  value,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
             ),
           ],
         ),
@@ -311,7 +284,7 @@ class ProfileTab extends StatelessWidget {
     );
   }
 
-  /// Menu Item (Clickable)
+  /// Menu Item
   Widget _menuItem(
     BuildContext context,
     IconData icon,
@@ -322,7 +295,6 @@ class ProfileTab extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 10),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 18),
           decoration: BoxDecoration(

@@ -13,93 +13,95 @@ class OrderConfirmed extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: width(context) * 0.04,
-          vertical: height(context) * 0.02,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Image.asset(AppAssets.orderconfirmed, height: 250, width: 300),
-            Center(
-              child: Text('Order Confirmed!', style: AppStyle.bold20orange),
-            ),
-            SizedBox(height: height(context) * 0.01),
-            Text(
-              'Please wait for the product owner\'s confirmation.!',
-              textAlign: TextAlign.center,
-              style: AppStyle.medium14ramdi,
-            ),
-            SizedBox(height: height(context) * 0.02),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: width(context) * 0.02,
-                vertical: height(context) * 0.02,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: width(context) * 0.04,
+            vertical: height(context) * 0.02,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Image.asset(AppAssets.orderconfirmed, height: 250, width: 300),
+              Center(
+                child: Text('Order Confirmed!', style: AppStyle.bold20orange),
               ),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: AppColor.whiteColor,
-                  borderRadius: BorderRadius.circular(16),
+              SizedBox(height: height(context) * 0.01),
+              Text(
+                'Please wait for the product owner\'s confirmation.!',
+                textAlign: TextAlign.center,
+                style: AppStyle.medium14ramdi,
+              ),
+              SizedBox(height: height(context) * 0.02),
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: width(context) * 0.02,
+                  vertical: height(context) * 0.02,
                 ),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: width(context) * 0.02,
-                        vertical: height(context) * 0.01,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppColor.whiteColor,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: width(context) * 0.02,
+                          vertical: height(context) * 0.01,
+                        ),
+                        child: Row(
+                          children: [
+                            Text('Order ID', style: AppStyle.medium14ramdi),
+                            Spacer(),
+                            Text('#SAH12894', style: AppStyle.semibold14orange),
+                          ],
+                        ),
                       ),
-                      child: Row(
-                        children: [
-                          Text('Order ID', style: AppStyle.medium14ramdi),
-                          Spacer(),
-                          Text('#SAH12894', style: AppStyle.semibold14orange),
-                        ],
+                      Divider(),
+                      buildInfoItem(
+                        context,
+                        icon: Icons.storefront_outlined,
+                        title: 'Store',
+                        subtitle: 'Fresh Bakery Corner',
                       ),
-                    ),
-                    Divider(),
-                    buildInfoItem(
-                      context,
-                      icon: Icons.storefront_outlined,
-                      title: 'Store',
-                      subtitle: 'Fresh Bakery Corner',
-                    ),
 
-                    SizedBox(height: height(context) * 0.03),
+                      SizedBox(height: height(context) * 0.03),
 
-                    /// method
-                    buildInfoItem(
-                      context,
-                      icon: Icons.shopping_bag_outlined,
-                      title: 'Method',
-                      subtitle: 'Pickup in 20 minutes',
-                    ),
+                      /// method
+                      buildInfoItem(
+                        context,
+                        icon: Icons.shopping_bag_outlined,
+                        title: 'Method',
+                        subtitle: 'Pickup in 20 minutes',
+                      ),
 
-                    SizedBox(height: height(context) * 0.03),
+                      SizedBox(height: height(context) * 0.03),
 
-                    /// date
-                    buildInfoItem(
-                      context,
-                      icon: Icons.calendar_month_outlined,
-                      title: 'Date & Time',
-                      subtitle: 'Oct 24, 2023 • 14:30 PM',
-                    ),
+                      /// date
+                      buildInfoItem(
+                        context,
+                        icon: Icons.calendar_month_outlined,
+                        title: 'Date & Time',
+                        subtitle: 'Oct 24, 2023 • 14:30 PM',
+                      ),
 
-                    SizedBox(height: height(context) * 0.03),
-                  ],
+                      SizedBox(height: height(context) * 0.03),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: height(context) * 0.03),
+              SizedBox(height: height(context) * 0.03),
 
-            CustomElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, Approutes.HomeScreen);
-              },
-              text: 'Back To Home',
-              textStyle: AppStyle.semibold20white,
-            ),
-          ],
+              CustomElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, Approutes.HomeScreen);
+                },
+                text: 'Back To Home',
+                textStyle: AppStyle.semibold20white,
+              ),
+            ],
+          ),
         ),
       ),
     );

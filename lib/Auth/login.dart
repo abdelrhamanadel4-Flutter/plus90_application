@@ -144,77 +144,81 @@ class Login extends StatelessWidget {
   }
 
   void login(BuildContext context) async {
-    if (formKey.currentState?.validate() == true) {
-      //todo: login logic here
-      //Show loading
-      DialogUtils.showLoading(context: context, loadingText: 'Logging in...');
-      try {
-        final credential = await FirebaseAuth.instance
-            .signInWithEmailAndPassword(
-              email: email.text,
-              password: password.text,
+    if (formKey.currentState?.validate() != true) return;
+
+    DialogUtils.showLoading(context: context, loadingText: 'Logging in...');
+
+    try {
+      /// 🔐 Firebase Login
+      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email.text,
+        password: password.text,
+      );
+
+      final uid = credential.user!.uid;
+
+      /// 📦 Get user data
+      var doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .get();
+
+      DialogUtils.hideLoading(context: context);
+
+      DialogUtils.showMessage(
+        context: context,
+        message: 'Login Successfully',
+        title: 'Success',
+        posActionName: 'OK',
+
+        posAction: () {
+          /// 👤 account type
+          String accountType = doc.data()?['accountType'] ?? "user";
+
+          /// 📍 location
+          double? lat = (doc.data()?['lat'] as num?)?.toDouble();
+
+          double? lng = (doc.data()?['lng'] as num?)?.toDouble();
+
+          /// 🚨 IF NO LOCATION
+          if (lat == null || lng == null) {
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              Approutes.ChooseLocationScreen,
+              (route) => false,
+              arguments: uid,
             );
-        DialogUtils.hideLoading(context: context);
-        DialogUtils.showMessage(
-          context: context,
-          message: 'Login Successfully.',
-          title: 'Success',
-          posActionName: 'OK',
-          posAction: () async {
-            var uid = FirebaseAuth.instance.currentUser!.uid;
 
-            var doc = await FirebaseFirestore.instance
-                .collection('users')
-                .doc(uid)
-                .get();
+            return;
+          }
 
-            String accountType = doc['accountType'];
+          /// 👤 USER HOME
+          if (accountType == "user") {
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              Approutes.HomeScreen,
+              (route) => false,
+            );
+          }
+          /// 🏪 STORE HOME
+          else {
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              Approutes.HomescreanStore,
+              (route) => false,
+            );
+          }
+        },
+      );
+    } on FirebaseAuthException catch (e) {
+      DialogUtils.hideLoading(context: context);
 
-            if (accountType == "user") {
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                Approutes.HomeScreen,
-                (route) => false,
-              );
-            } else {
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                Approutes.HomescreanStore,
-                (route) => false,
-              );
-            }
-          },
-        );
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'user-not-found') {
-          DialogUtils.hideLoading(context: context);
-          DialogUtils.showMessage(
-            context: context,
-            message: 'No user found for that email.',
-            title: 'Error',
-            posActionName: 'OK',
-          );
-          print('No user found for that email.');
-        } else if (e.code == 'wrong-password') {
-          DialogUtils.hideLoading(context: context);
-          DialogUtils.showMessage(
-            context: context,
-            message: 'Wrong password provided for that user.',
-            title: 'Error',
-            posActionName: 'OK',
-          );
-          print('Wrong password provided for that user.');
-        }
-        DialogUtils.hideLoading(context: context);
-        DialogUtils.showMessage(
-          context: context,
-          message: 'Wrong password or email provided for that user.',
-          title: 'Error',
-          posActionName: 'OK',
-        );
-      }
-
-      // Navigator.of( context,).pushNamedAndRemoveUntil(Approutes.HomeScreen, (route) => false);
+      DialogUtils.showMessage(
+        context: context,
+        message: e.message ?? "Login Failed",
+        title: 'Error',
+        posActionName: 'OK',
+      );
     }
   }
 }
