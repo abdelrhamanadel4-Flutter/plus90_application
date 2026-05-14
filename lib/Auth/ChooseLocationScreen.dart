@@ -1,15 +1,20 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:plus90_application/utils/AppRoutes.dart';
 import 'package:plus90_application/utils/app_color.dart';
 
 class ChooseLocationScreen extends StatefulWidget {
-  const ChooseLocationScreen({super.key});
+  final bool fromAddItem;
+
+  const ChooseLocationScreen({super.key, this.fromAddItem = false});
 
   @override
   State<ChooseLocationScreen> createState() => _ChooseLocationScreenState();
@@ -17,81 +22,59 @@ class ChooseLocationScreen extends StatefulWidget {
 
 class _ChooseLocationScreenState extends State<ChooseLocationScreen> {
   LatLng? selectedLocation;
-
   bool loading = false;
-
   final MapController mapController = MapController();
-
   final TextEditingController searchController = TextEditingController();
-
   List<dynamic> suggestions = [];
-
   Timer? _debounce;
 
   @override
   void initState() {
     super.initState();
-
     getCurrentLocation();
   }
 
-  /// 📍 CURRENT LOCATION
   Future<void> getCurrentLocation() async {
     setState(() => loading = true);
-
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-
       if (!serviceEnabled) {
         setState(() => loading = false);
         return;
       }
-
       LocationPermission permission = await Geolocator.requestPermission();
-
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
         setState(() => loading = false);
         return;
       }
-
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
-
       final pos = LatLng(position.latitude, position.longitude);
-
       setState(() {
         selectedLocation = pos;
         loading = false;
       });
-
       mapController.move(pos, 15);
-
       await getAddressFromLatLng(position.latitude, position.longitude);
     } catch (e) {
       setState(() => loading = false);
     }
   }
 
-  /// 🔎 SEARCH DEBOUNCE
   void onSearchChanged(String value) {
-    if (_debounce?.isActive ?? false) {
-      _debounce!.cancel();
-    }
-
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 350), () {
       fetchSuggestions(value.trim());
     });
   }
 
-  /// 🔎 SEARCH IN EGYPT ONLY
   Future<void> fetchSuggestions(String query) async {
     if (query.isEmpty) {
       setState(() => suggestions = []);
       return;
     }
-
     final url = Uri.parse(
       "https://nominatim.openstreetmap.org/search"
       "?q=$query"
@@ -103,23 +86,18 @@ class _ChooseLocationScreenState extends State<ChooseLocationScreen> {
       "&viewbox=24.7,31.7,36.9,21.8"
       "&bounded=1",
     );
-
     final response = await http.get(url, headers: {"User-Agent": "plus90-app"});
-
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-
       setState(() {
         suggestions = data.where((item) {
           final name = item['display_name'];
-
           return name != null && name.toString().length > 3;
         }).toList();
       });
     }
   }
 
-  /// 📍 GET ADDRESS FROM LAT LNG
   Future<void> getAddressFromLatLng(double lat, double lng) async {
     try {
       final url = Uri.parse(
@@ -128,17 +106,13 @@ class _ChooseLocationScreenState extends State<ChooseLocationScreen> {
         "&lon=$lng"
         "&format=json",
       );
-
       final response = await http.get(
         url,
         headers: {"User-Agent": "plus90-app"},
       );
-
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-
         final address = data["display_name"];
-
         setState(() {
           searchController.text = address ?? "";
         });
@@ -148,29 +122,67 @@ class _ChooseLocationScreenState extends State<ChooseLocationScreen> {
     }
   }
 
-  /// 💾 SAVE LOCATION
-  void saveLocation() {
+  Future<void> saveLocation() async {
     if (selectedLocation == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please select location first")),
       );
-
       return;
     }
 
-    Navigator.pop(context, {
-      "address": searchController.text,
-      "lat": selectedLocation!.latitude,
-      "lng": selectedLocation!.longitude,
+    // ✅ لو جاي من AddItem - ارجع بالـ result بس
+    if (widget.fromAddItem) {
+      Navigator.pop(context, {
+        "address": searchController.text,
+        "lat": selectedLocation!.latitude,
+        "lng": selectedLocation!.longitude,
+      });
+      return;
+    }
+
+    // ✅ لو جاي من Login - احفظ في Firestore وروح للهوم
+    setState(() => loading = true);
+
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+
+    await FirebaseFirestore.instance.collection('users').doc(uid).update({
+      'lat': selectedLocation!.latitude,
+      'lng': selectedLocation!.longitude,
+      'address': searchController.text,
     });
+
+    final doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .get();
+
+    // ✅ بنقرأ "role" مش "accountType"
+    final role = doc.data()?['role'] ?? 'user';
+
+    setState(() => loading = false);
+
+    if (!mounted) return;
+
+    if (role == 'user') {
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        Approutes.HomeScreen,
+        (route) => false,
+      );
+    } else {
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        Approutes.HomescreanStore,
+        (route) => false,
+      );
+    }
   }
 
   @override
   void dispose() {
     _debounce?.cancel();
-
     searchController.dispose();
-
     super.dispose();
   }
 
@@ -179,19 +191,15 @@ class _ChooseLocationScreenState extends State<ChooseLocationScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          /// 🗺️ MAP
           FlutterMap(
             mapController: mapController,
             options: MapOptions(
               initialCenter: LatLng(30.0444, 31.2357),
-
               initialZoom: 13,
-
               onTap: (tapPosition, point) async {
                 setState(() {
                   selectedLocation = point;
                 });
-
                 await getAddressFromLatLng(point.latitude, point.longitude);
               },
             ),
@@ -199,10 +207,8 @@ class _ChooseLocationScreenState extends State<ChooseLocationScreen> {
               TileLayer(
                 urlTemplate:
                     "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-
                 subdomains: const ['a', 'b', 'c', 'd'],
               ),
-
               MarkerLayer(
                 markers: [
                   if (selectedLocation != null)
@@ -221,7 +227,6 @@ class _ChooseLocationScreenState extends State<ChooseLocationScreen> {
             ],
           ),
 
-          /// 🔎 SEARCH BAR
           Positioned(
             top: 120,
             left: 20,
@@ -247,7 +252,6 @@ class _ChooseLocationScreenState extends State<ChooseLocationScreen> {
             ),
           ),
 
-          /// 📍 SUGGESTIONS
           if (suggestions.isNotEmpty)
             Positioned(
               top: 180,
@@ -266,7 +270,6 @@ class _ChooseLocationScreenState extends State<ChooseLocationScreen> {
                   itemCount: suggestions.length,
                   itemBuilder: (context, index) {
                     final item = suggestions[index];
-
                     return ListTile(
                       leading: const Icon(
                         Icons.location_on,
@@ -279,21 +282,14 @@ class _ChooseLocationScreenState extends State<ChooseLocationScreen> {
                       ),
                       onTap: () async {
                         final lat = double.parse(item['lat']);
-
                         final lon = double.parse(item['lon']);
-
                         final pos = LatLng(lat, lon);
-
                         setState(() {
                           selectedLocation = pos;
-
                           searchController.text = item['display_name'];
-
                           suggestions = [];
                         });
-
                         mapController.move(pos, 15);
-
                         await getAddressFromLatLng(lat, lon);
                       },
                     );
@@ -302,7 +298,6 @@ class _ChooseLocationScreenState extends State<ChooseLocationScreen> {
               ),
             ),
 
-          /// 🔝 HEADER
           Positioned(
             top: 50,
             left: 20,
@@ -319,9 +314,7 @@ class _ChooseLocationScreenState extends State<ChooseLocationScreen> {
               child: const Row(
                 children: [
                   Icon(Icons.location_on, color: AppColor.orange),
-
                   SizedBox(width: 10),
-
                   Expanded(
                     child: Text(
                       "Choose Location",
@@ -333,7 +326,6 @@ class _ChooseLocationScreenState extends State<ChooseLocationScreen> {
             ),
           ),
 
-          /// 📍 MY LOCATION
           Positioned(
             bottom: 140,
             right: 20,
@@ -344,7 +336,6 @@ class _ChooseLocationScreenState extends State<ChooseLocationScreen> {
             ),
           ),
 
-          /// 💾 SAVE
           Positioned(
             bottom: 30,
             left: 20,
@@ -371,7 +362,6 @@ class _ChooseLocationScreenState extends State<ChooseLocationScreen> {
             ),
           ),
 
-          /// 🔄 LOADING
           if (loading)
             Container(
               color: Colors.black26,

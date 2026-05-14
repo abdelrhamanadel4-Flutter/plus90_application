@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_floating_bottom_bar/flutter_floating_bottom_bar.dart';
 import 'package:plus90_application/Home/store/homestore.dart';
 
-import 'package:plus90_application/Home/user/tabs/profile.dart';
+import 'package:plus90_application/Home/user/tabs/profile/profile.dart';
 import 'package:plus90_application/screens/incomingorder/IncomingOrder.dart';
 import 'package:plus90_application/screens/myitem/MyItems.dart';
 import 'package:plus90_application/utils/AppRoutes.dart';

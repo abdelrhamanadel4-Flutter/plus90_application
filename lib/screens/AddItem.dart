@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -24,7 +25,7 @@ class _AddItemScreenState extends State<AddItem> {
     "Home Services",
     "Electronics",
     "Events",
-    "Automotive"
+    "Automotive",
   ];
 
   final ImagePicker _picker = ImagePicker();
@@ -32,10 +33,8 @@ class _AddItemScreenState extends State<AddItem> {
   TextEditingController descriptionController = TextEditingController();
   TextEditingController locationController = TextEditingController();
   TextEditingController expiryController = TextEditingController();
-    TextEditingController intialprice = TextEditingController();
-        TextEditingController finalprice = TextEditingController();
-
-
+  TextEditingController intialprice = TextEditingController();
+  TextEditingController finalprice = TextEditingController();
 
   List<XFile> images = [];
   double? selectedLat;
@@ -44,7 +43,6 @@ class _AddItemScreenState extends State<AddItem> {
 
   Future<void> pickImages() async {
     final status = await Permission.photos.request();
-
     if (status.isGranted) {
       final List<XFile> picked = await _picker.pickMultiImage();
       if (picked.isNotEmpty) {
@@ -53,9 +51,9 @@ class _AddItemScreenState extends State<AddItem> {
         });
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Permission denied")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Permission denied")));
     }
   }
 
@@ -96,34 +94,69 @@ class _AddItemScreenState extends State<AddItem> {
   String _formatRemainingTime(DateTime expiry) {
     final duration = expiry.difference(DateTime.now());
     if (duration.isNegative) return "Expired";
-
     int days = duration.inDays;
     int hours = duration.inHours % 24;
     return "Expires in: $days Days and $hours Hours";
   }
 
   Future<void> submitDeal() async {
-    if (titleController.text.isEmpty || images.isEmpty) {
+    if (titleController.text.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Please enter a title")));
+      return;
+    }
+
+    if (intialprice.text.isEmpty || finalprice.text.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Please enter prices")));
+      return;
+    }
+
+    if (descriptionController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please fill required fields")),
+        const SnackBar(content: Text("Please enter a description")),
       );
+      return;
+    }
+
+    if (locationController.text.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Please select a location")));
+      return;
+    }
+
+    if (expiryDateTime == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select an expiry date")),
+      );
+      return;
+    }
+
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("User not logged in")));
       return;
     }
 
     try {
       await FirebaseFirestore.instance.collection("deals").add({
+        "uid": uid,
         "title": titleController.text,
         "description": descriptionController.text,
         "category": selectedCategory,
         "location": locationController.text,
         "lat": selectedLat,
         "lng": selectedLng,
-        "images": [
-        ],   
-       "expiry": expiryDateTime?.toIso8601String(),
+        "images": [],
+        "expiry": expiryDateTime?.toIso8601String(),
         "createdAt": FieldValue.serverTimestamp(),
-         "initialPrice": intialprice.text,
-     "discountedPrice": finalprice.text,
+        "initialPrice": intialprice.text,
+        "discountedPrice": finalprice.text,
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -140,11 +173,10 @@ class _AddItemScreenState extends State<AddItem> {
       });
 
       Navigator.pop(context);
-
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Error: $e")));
     }
   }
 
@@ -157,7 +189,6 @@ class _AddItemScreenState extends State<AddItem> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             const Text(
               "Photos For Post",
               style: TextStyle(
@@ -165,9 +196,7 @@ class _AddItemScreenState extends State<AddItem> {
                 fontWeight: FontWeight.w600,
               ),
             ),
-
             const SizedBox(height: 10),
-
             GestureDetector(
               onTap: pickImages,
               child: Container(
@@ -178,7 +207,9 @@ class _AddItemScreenState extends State<AddItem> {
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: images.isEmpty
-                    ? const Center(child: Text("Tap to upload images"))
+                    ? const Center(
+                        child: Text("Tap to upload images (optional)"),
+                      )
                     : ListView.builder(
                         scrollDirection: Axis.horizontal,
                         itemCount: images.length,
@@ -193,23 +224,21 @@ class _AddItemScreenState extends State<AddItem> {
                                 height: 110,
                                 fit: BoxFit.cover,
                               ),
-                              
                             ),
                           );
                         },
                       ),
               ),
             ),
-
             const SizedBox(height: 20),
-
-            const Text("TITLE",
-                style: TextStyle(
-                    color: Color(0xFF8B1E3F),
-                    fontWeight: FontWeight.bold)),
-
+            const Text(
+              "TITLE",
+              style: TextStyle(
+                color: Color(0xFF8B1E3F),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 8),
-
             TextField(
               controller: titleController,
               decoration: InputDecoration(
@@ -217,18 +246,20 @@ class _AddItemScreenState extends State<AddItem> {
                 filled: true,
                 fillColor: const Color(0xFFE0E5E2),
                 border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none),
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
               ),
             ),
-            
-
             const SizedBox(height: 15),
-           
-           const Text("Prices",style: TextStyle(color: Color(0xFF8B1E3F),fontWeight: FontWeight.bold,),),
-
-            SizedBox(height: 8),
-
+            const Text(
+              "Prices",
+              style: TextStyle(
+                color: Color(0xFF8B1E3F),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
             Row(
               children: [
                 Expanded(
@@ -238,7 +269,7 @@ class _AddItemScreenState extends State<AddItem> {
                     decoration: InputDecoration(
                       hintText: "Original Price",
                       filled: true,
-                      fillColor: Color(0xFFE0E5E2),
+                      fillColor: const Color(0xFFE0E5E2),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide.none,
@@ -246,9 +277,7 @@ class _AddItemScreenState extends State<AddItem> {
                     ),
                   ),
                 ),
-
-                SizedBox(width: 10),
-
+                const SizedBox(width: 10),
                 Expanded(
                   child: TextField(
                     controller: finalprice,
@@ -256,7 +285,7 @@ class _AddItemScreenState extends State<AddItem> {
                     decoration: InputDecoration(
                       hintText: "Discounted Price",
                       filled: true,
-                      fillColor: Color(0xFFE0E5E2),
+                      fillColor: const Color(0xFFE0E5E2),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide.none,
@@ -266,16 +295,15 @@ class _AddItemScreenState extends State<AddItem> {
                 ),
               ],
             ),
-
-SizedBox(height: 15),
-
-            const Text("DESCRIPTION",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF8B1E3F))),
-
+            const SizedBox(height: 15),
+            const Text(
+              "DESCRIPTION",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF8B1E3F),
+              ),
+            ),
             const SizedBox(height: 8),
-
             TextField(
               controller: descriptionController,
               maxLines: 3,
@@ -284,79 +312,81 @@ SizedBox(height: 15),
                 filled: true,
                 fillColor: const Color(0xFFE0E5E2),
                 border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none),
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
               ),
             ),
-
             const SizedBox(height: 15),
-
-            const Text("CATEGORY",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF8B1E3F))),
-
+            const Text(
+              "CATEGORY",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF8B1E3F),
+              ),
+            ),
             const SizedBox(height: 10),
-
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: categories.map((cat) {
                   final isSelected = selectedCategory == cat;
-
                   return Padding(
                     padding: const EdgeInsets.only(right: 8),
                     child: ChoiceChip(
-                      label: Text(cat,
-                          style: TextStyle(
-                              color: isSelected
-                                  ? Colors.white
-                                  : const Color(0xFF8B1E3F))),
+                      label: Text(
+                        cat,
+                        style: TextStyle(
+                          color: isSelected
+                              ? Colors.white
+                              : const Color(0xFF8B1E3F),
+                        ),
+                      ),
                       selected: isSelected,
                       selectedColor: const Color(0xFF8B1E3F),
                       backgroundColor: Colors.grey.shade200,
                       showCheckmark: false,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(25)),
-                      onSelected: (_) =>
-                          setState(() => selectedCategory = cat),
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      onSelected: (_) => setState(() => selectedCategory = cat),
                     ),
                   );
                 }).toList(),
               ),
             ),
-
             const SizedBox(height: 30),
-
-            const Text("EXPIRY TIME",
-                style: TextStyle(
-                    color: Color(0xFF8B1E3F),
-                    fontWeight: FontWeight.bold)),
-
+            const Text(
+              "EXPIRY TIME",
+              style: TextStyle(
+                color: Color(0xFF8B1E3F),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 8),
-
             TextField(
               controller: expiryController,
               readOnly: true,
               onTap: pickExpiryDateTime,
               decoration: InputDecoration(
+                hintText: "Select expiry date and time",
                 filled: true,
                 fillColor: const Color(0xFFE0E5E2),
                 border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none),
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
               ),
             ),
-
             const SizedBox(height: 15),
-
-            const Text("LOCATION",
-                style: TextStyle(
-                    color: Color(0xFF8B1E3F),
-                    fontWeight: FontWeight.bold)),
-
+            const Text(
+              "LOCATION",
+              style: TextStyle(
+                color: Color(0xFF8B1E3F),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 8),
-
             TextField(
               controller: locationController,
               readOnly: true,
@@ -364,10 +394,11 @@ SizedBox(height: 15),
                 final result = await Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          const ChooseLocationScreen()),
+                    // ✅ fromAddItem: true عشان يرجع بالـ result
+                    builder: (context) =>
+                        const ChooseLocationScreen(fromAddItem: true),
+                  ),
                 );
-
                 if (result != null) {
                   setState(() {
                     locationController.text = result["address"];
@@ -378,18 +409,19 @@ SizedBox(height: 15),
               },
               decoration: InputDecoration(
                 hintText: "Select store location",
-                prefixIcon:
-                    const Icon(Icons.location_on, color: Color(0xFF8B1E3F)),
+                prefixIcon: const Icon(
+                  Icons.location_on,
+                  color: Color(0xFF8B1E3F),
+                ),
                 filled: true,
                 fillColor: const Color(0xFFE0E5E2),
                 border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none),
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
               ),
             ),
-
             const SizedBox(height: 40),
-
             Center(
               child: SizedBox(
                 width: MediaQuery.of(context).size.width * 0.85,
@@ -399,14 +431,16 @@ SizedBox(height: 15),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF8B1E3F),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                   child: const Text(
                     "Publish Deal",
                     style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600),
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),

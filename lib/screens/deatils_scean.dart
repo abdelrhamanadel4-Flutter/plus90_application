@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -14,10 +15,7 @@ import 'package:provider/provider.dart';
 class DetailsScreen extends StatefulWidget {
   final Map<String, dynamic> dealData;
 
-  const DetailsScreen({
-    super.key,
-    required this.dealData,
-  });
+  const DetailsScreen({super.key, required this.dealData});
 
   @override
   State<DetailsScreen> createState() => _DetailsScreenState();
@@ -31,6 +29,10 @@ class _DetailsScreenState extends State<DetailsScreen> {
   bool isStore = false;
   bool isLoadingRole = true;
 
+  // ✅ بيانات صاحب الديل
+  Map<String, dynamic>? _ownerData;
+  bool isLoadingOwner = true;
+
   Timer? _timer;
   Duration _remaining = Duration.zero;
 
@@ -38,10 +40,42 @@ class _DetailsScreenState extends State<DetailsScreen> {
   void initState() {
     super.initState();
     _fetchUserRole();
+    _fetchOwnerData(); // ✅ جلب بيانات الـ owner
     _startTimer();
   }
 
-  /// جيب الـ role من Firestore
+  Widget _buildProfileImage(String? photoURL) {
+    if (photoURL == null || photoURL.isEmpty) {
+      return const Icon(Icons.person, size: 30, color: Colors.white);
+    }
+
+    if (photoURL.startsWith('data:image')) {
+      try {
+        final base64Str = photoURL.split(',').last;
+        return Image.memory(
+          base64Decode(base64Str),
+          width: 50,
+          height: 50,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) =>
+              const Icon(Icons.person, size: 30, color: Colors.white),
+        );
+      } catch (_) {
+        return const Icon(Icons.person, size: 30, color: Colors.white);
+      }
+    }
+
+    return Image.network(
+      photoURL,
+      width: 50,
+      height: 50,
+      fit: BoxFit.cover,
+      errorBuilder: (_, __, ___) =>
+          const Icon(Icons.person, size: 30, color: Colors.white),
+    );
+  }
+
+  /// جيب الـ role من Firestore للـ current user
   Future<void> _fetchUserRole() async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
@@ -52,11 +86,34 @@ class _DetailsScreenState extends State<DetailsScreen> {
         .get();
 
     if (doc.exists) {
-      final role = doc.data()?['role'] ?? 'user';
+      final role = doc.data()?['accountType'] ?? 'user';
       setState(() {
         isStore = role == 'store';
         isLoadingRole = false;
       });
+    }
+  }
+
+  /// ✅ جيب بيانات صاحب الديل من Firestore بناءً على الـ uid اللي اتحفظ في الديل
+  Future<void> _fetchOwnerData() async {
+    final ownerUid = widget.dealData['uid'];
+    if (ownerUid == null) {
+      setState(() => isLoadingOwner = false);
+      return;
+    }
+
+    final doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(ownerUid)
+        .get();
+
+    if (doc.exists) {
+      setState(() {
+        _ownerData = doc.data();
+        isLoadingOwner = false;
+      });
+    } else {
+      setState(() => isLoadingOwner = false);
     }
   }
 
@@ -146,11 +203,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                         fit: BoxFit.fill,
                       ),
                     )
-                  : Image.asset(
-                      AppAssets.donut,
-                      height: 280,
-                      fit: BoxFit.fill,
-                    ),
+                  : Image.asset(AppAssets.donut, height: 280, fit: BoxFit.fill),
             ),
 
             Expanded(
@@ -280,7 +333,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
                       const SizedBox(height: 20),
 
-                      /// store info card
+                      /// ✅ store info card - ديناميكي من Firestore
                       Container(
                         padding: const EdgeInsets.all(15),
                         decoration: BoxDecoration(
@@ -288,73 +341,89 @@ class _DetailsScreenState extends State<DetailsScreen> {
                           border: Border.all(color: AppColor.orange),
                           color: AppColor.offwhite,
                         ),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                const CircleAvatar(
-                                  radius: 25,
-                                  backgroundImage:
-                                      AssetImage(AppAssets.donut),
+                        child: isLoadingOwner
+                            ? const Center(
+                                child: Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: CircularProgressIndicator(),
                                 ),
-                                const SizedBox(width: 12),
-                                const Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                              )
+                            : Column(
+                                children: [
+                                  Row(
                                     children: [
-                                      Text(
-                                        "Shrouk Mohamed",
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
+                                      CircleAvatar(
+                                        radius: 25,
+                                        backgroundColor: Colors.grey,
+                                        child: ClipOval(
+                                          child: _buildProfileImage(
+                                            _ownerData?['photoURL'],
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            // ✅ الاسم من Firestore
+                                            Text(
+                                              _ownerData?['name'] ?? 'Unknown',
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            // ✅ الـ accountType من Firestore
+                                            Text(
+                                              _ownerData?['accountType'] ?? '',
+                                              style: const TextStyle(
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      IconButton(
+                                        onPressed: () {},
+                                        icon: const Icon(
+                                          Icons.phone,
+                                          color: AppColor.orange,
+                                        ),
+                                      ),
+                                      // ✅ التليفون من Firestore
+                                      Text(_ownerData?['phone'] ?? ''),
+                                    ],
+                                  ),
+                                  const Divider(height: 25),
+                                  Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.location_on,
+                                        color: AppColor.orange,
+                                        size: 24,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          data['location'] ?? '',
+                                          style: const TextStyle(fontSize: 12),
                                         ),
                                       ),
                                       Text(
-                                        "Owner",
-                                        style: TextStyle(color: Colors.grey),
+                                        'View Details',
+                                        style: AppStyle.medium14orange,
+                                      ),
+                                      const Icon(
+                                        Icons.arrow_forward_ios,
+                                        size: 14,
+                                        color: AppColor.orange,
                                       ),
                                     ],
                                   ),
-                                ),
-                                IconButton(
-                                  onPressed: () {},
-                                  icon: const Icon(
-                                    Icons.phone,
-                                    color: AppColor.orange,
-                                  ),
-                                ),
-                                const Text("01123673905"),
-                              ],
-                            ),
-                            const Divider(height: 25),
-                            Row(
-                              children: [
-                                const Icon(
-                                  Icons.location_on,
-                                  color: AppColor.orange,
-                                  size: 24,
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    data['location'] ?? '',
-                                    style: const TextStyle(fontSize: 12),
-                                  ),
-                                ),
-                                Text(
-                                  'View Details',
-                                  style: AppStyle.medium14orange,
-                                ),
-                                const Icon(
-                                  Icons.arrow_forward_ios,
-                                  size: 14,
-                                  color: AppColor.orange,
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                                ],
+                              ),
                       ),
 
                       const SizedBox(height: 20),
@@ -367,50 +436,63 @@ class _DetailsScreenState extends State<DetailsScreen> {
                           child: isLoadingRole
                               ? const Center(child: CircularProgressIndicator())
                               : isStore
-                                  /// Store → Edit
-                                  ? CustomElevatedButton(
-                                      onPressed: () {
-                                        // Navigator.push(context, MaterialPageRoute(
-                                        //   builder: (_) => EditDealScreen(dealData: widget.dealData),
-                                        // ));
-                                      },
-                                      text: 'Edit Deal',
-                                      textStyle: AppStyle.semibold20white,
-                                      hasSuffix: true,
-                                      iconWidgetSuf: const Icon(
-                                        Icons.edit_outlined,
-                                        color: AppColor.offwhite,
-                                      ),
-                                    )
-                                  /// User → Add to Cart
-                                  : CustomElevatedButton(
-                                      onPressed: () {
-        final cart = Provider.of<CartProvider>(context, listen: false);
+                              /// Store → Edit
+                              ? CustomElevatedButton(
+                                  onPressed: () {
+                                    // Navigator.push(context, MaterialPageRoute(
+                                    //   builder: (_) => EditDealScreen(dealData: widget.dealData),
+                                    // ));
+                                  },
+                                  text: 'Edit Deal',
+                                  textStyle: AppStyle.semibold20white,
+                                  hasSuffix: true,
+                                  iconWidgetSuf: const Icon(
+                                    Icons.edit_outlined,
+                                    color: AppColor.offwhite,
+                                  ),
+                                )
+                              /// User → Add to Cart
+                              : CustomElevatedButton(
+                                  onPressed: () {
+                                    final cart = Provider.of<CartProvider>(
+                                      context,
+                                      listen: false,
+                                    );
 
-  cart.addItem(
-    id: data['id'] ?? '',
-    title: data['title'] ?? '',
-    price: double.tryParse(data['discountedPrice'].toString()) ?? 0,
-    oldPrice: double.tryParse(data['initialPrice'].toString()) ?? 0,
-    image: (data['images'] != null && data['images'].isNotEmpty)
-        ? data['images'][0]
-        : '',
-  );
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) => const CartTab(),
-                                          ),
-                                        );
-                                      },
-                                      text: 'Add to cart',
-                                      textStyle: AppStyle.semibold20white,
-                                      hasSuffix: true,
-                                      iconWidgetSuf: const Icon(
-                                        Icons.shopping_cart_outlined,
-                                        color: AppColor.offwhite,
+                                    cart.addItem(
+                                      id: data['id'] ?? '',
+                                      title: data['title'] ?? '',
+                                      price:
+                                          double.tryParse(
+                                            data['discountedPrice'].toString(),
+                                          ) ??
+                                          0,
+                                      oldPrice:
+                                          double.tryParse(
+                                            data['initialPrice'].toString(),
+                                          ) ??
+                                          0,
+                                      image:
+                                          (data['images'] != null &&
+                                              data['images'].isNotEmpty)
+                                          ? data['images'][0]
+                                          : '',
+                                    );
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const CartTab(),
                                       ),
-                                    ),
+                                    );
+                                  },
+                                  text: 'Add to cart',
+                                  textStyle: AppStyle.semibold20white,
+                                  hasSuffix: true,
+                                  iconWidgetSuf: const Icon(
+                                    Icons.shopping_cart_outlined,
+                                    color: AppColor.offwhite,
+                                  ),
+                                ),
                         ),
                       ),
                     ],

@@ -24,6 +24,7 @@ class _CategoriesState extends State<Categories> {
   String selectedCategory = "All";
 
   final List<String> catgory = [
+    "All", // ← أضفنا "All" كأول عنصر عشان selectedindex=0 يطابقه
     "Offers",
     "Restaurants & Cafes",
     "Fashion",
@@ -31,8 +32,27 @@ class _CategoriesState extends State<Categories> {
     "Home Services",
     "Electronics",
     "Events",
-    "Automotive"
+    "Automotive",
   ];
+
+  @override
+  void initState() {
+    super.initState();
+
+    // استقبل الـ category argument اللي جت من الـ Home
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final args = ModalRoute.of(context)?.settings.arguments as String?;
+      if (args != null && args.isNotEmpty) {
+        final idx = catgory.indexOf(args);
+        if (idx != -1) {
+          setState(() {
+            selectedindex = idx;
+            selectedCategory = args;
+          });
+        }
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -168,8 +188,7 @@ class _CategoriesState extends State<Categories> {
 
           /// FIREBASE + FILTER
           StreamBuilder(
-            stream:
-                FirebaseFirestore.instance.collection("deals").snapshots(),
+            stream: FirebaseFirestore.instance.collection("deals").snapshots(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
@@ -184,12 +203,13 @@ class _CategoriesState extends State<Categories> {
               final filteredDeals = allDeals.where((doc) {
                 final data = doc.data();
 
-                final title =
-                    (data['title'] ?? '').toString().toLowerCase();
-                final location =
-                    (data['location'] ?? '').toString().toLowerCase();
+                final title = (data['title'] ?? '').toString().toLowerCase();
+                final location = (data['location'] ?? '')
+                    .toString()
+                    .toLowerCase();
                 final category = (data['category'] ?? '').toString();
 
+                // لو selectedCategory == "All" → مش بنفلتر بالكاتيجوري
                 final matchesCategory = selectedCategory == "All"
                     ? true
                     : category == selectedCategory;
@@ -197,10 +217,28 @@ class _CategoriesState extends State<Categories> {
                 final matchesSearch = searchText.isEmpty
                     ? true
                     : title.contains(searchText) ||
-                        location.contains(searchText);
+                          location.contains(searchText);
 
-                return matchesCategory && matchesSearch;
+                final expiryStr = data['expiry']?.toString();
+                bool isActive = true;
+                if (expiryStr != null && expiryStr.isNotEmpty) {
+                  final expiryDate = DateTime.tryParse(expiryStr);
+                  if (expiryDate != null) {
+                    isActive = expiryDate.isAfter(DateTime.now());
+                  }
+                }
+
+                return matchesCategory && matchesSearch && isActive;
               }).toList();
+
+              if (filteredDeals.isEmpty) {
+                return const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(32.0),
+                    child: Text("No Deals Found"),
+                  ),
+                );
+              }
 
               return ListView.builder(
                 itemCount: filteredDeals.length,
@@ -210,19 +248,13 @@ class _CategoriesState extends State<Categories> {
                   horizontal: width(context) * 0.04,
                 ),
                 itemBuilder: (context, index) {
-                  final data =
-                      filteredDeals[index].data();
+                  final data = filteredDeals[index].data();
                   final doc = filteredDeals[index];
                   final id = doc.id;
 
                   return Padding(
-                    padding: EdgeInsets.only(
-                      bottom: height(context) * 0.015,
-                    ),
-                    child: CardItem(
-                      dealData: data,
-                      id: id,
-                    ),
+                    padding: EdgeInsets.only(bottom: height(context) * 0.015),
+                    child: CardItem(dealData: data, id: id),
                   );
                 },
               );
@@ -248,9 +280,7 @@ class _CategoriesState extends State<Categories> {
       alignment: Alignment.center,
       child: Text(
         title,
-        style: isSelected
-            ? AppStyle.medium14white
-            : AppStyle.medium14orange,
+        style: isSelected ? AppStyle.medium14white : AppStyle.medium14orange,
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:plus90_application/screens/myitem/card.dart';
 import 'package:plus90_application/utils/app-assets.dart';
@@ -12,89 +13,75 @@ class MyItems extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+
     return Scaffold(
       backgroundColor: AppColor.offwhite,
-      body: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: width(context) * 0.04,
-          vertical: height(context) * 0.01,
-        ),
-        child: ListView(
-          children: [
-            Column(
-              children: [
-                Image.asset(AppAssets.myitems),
-                SizedBox(height: height(context) * 0.01),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('deals')
+            .where('uid', isEqualTo: uid)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-                /// ✅ StreamBuilder بيجيب الديلز من Firestore real-time
-                StreamBuilder<QuerySnapshot>(
-                  stream: FirebaseFirestore.instance
-                      .collection('deals')
-                      .orderBy('createdAt', descending: true)
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    /// loading
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
+          if (snapshot.hasError) {
+            return const Center(child: Text("Something went wrong"));
+          }
 
-                    /// error
-                    if (snapshot.hasError) {
-                      return const Center(child: Text("Something went wrong"));
-                    }
+          final deals = snapshot.data?.docs ?? [];
 
-                    /// empty
-                    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                      return const Center(
-                        child: Padding(
-                          padding: EdgeInsets.only(top: 40),
-                          child: Text(
-                            "No deals yet",
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                        ),
-                      );
-                    }
-
-                    final deals = snapshot.data!.docs;
-
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: deals.length,
-                      itemBuilder: (context, index) {
-                        final data =
-                            deals[index].data() as Map<String, dynamic>;
-
-                        /// تحويل expiry من String لـ DateTime
-                        DateTime? expiryDate;
-                        if (data['expiry'] != null) {
-                          expiryDate = DateTime.tryParse(data['expiry']);
-                        }
-
-                        return Padding(
-                          padding: EdgeInsets.symmetric(
-                            vertical: width(context) * 0.015,
-                          ),
-                          child: CardMyItem(
-                            title: data['title'] ?? '',
-                            location: data['location'] ?? '',
-                            initialPrice: data['initialPrice'] ?? '0',
-                            discountedPrice: data['discountedPrice'] ?? '0',
-                            imageUrl: (data['images'] as List?)?.isNotEmpty == true
-                                ? data['images'][0]
-                                : null,
-                            expiryDate: expiryDate,
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
-              ],
+          return ListView.builder(
+            padding: EdgeInsets.symmetric(
+              horizontal: width(context) * 0.04,
+              vertical: height(context) * 0.01,
             ),
-          ],
-        ),
+            itemCount: deals.length + 1, // ✅ +1 عشان الـ header
+            itemBuilder: (context, index) {
+              // ✅ أول عنصر هو الـ header
+              if (index == 0) {
+                return Column(
+                  children: [
+                    Image.asset(AppAssets.myitems),
+                    SizedBox(height: height(context) * 0.01),
+                    if (deals.isEmpty)
+                      const Padding(
+                        padding: EdgeInsets.only(top: 40),
+                        child: Text(
+                          "No deals yet",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ),
+                  ],
+                );
+              }
+
+              // ✅ باقي العناصر هي الـ deals
+              final data = deals[index - 1].data() as Map<String, dynamic>;
+
+              DateTime? expiryDate;
+              if (data['expiry'] != null) {
+                expiryDate = DateTime.tryParse(data['expiry']);
+              }
+
+              return Padding(
+                padding: EdgeInsets.symmetric(vertical: width(context) * 0.015),
+                child: CardMyItem(
+                  title: data['title'] ?? '',
+                  location: data['location'] ?? '',
+                  initialPrice: data['initialPrice'] ?? '0',
+                  discountedPrice: data['discountedPrice'] ?? '0',
+                  imageUrl: (data['images'] as List?)?.isNotEmpty == true
+                      ? data['images'][0]
+                      : null,
+                  expiryDate: expiryDate,
+                ),
+              );
+            },
+          );
+        },
       ),
     );
   }

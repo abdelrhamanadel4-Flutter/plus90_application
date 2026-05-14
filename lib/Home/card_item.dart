@@ -35,109 +35,109 @@ class CardItem extends StatelessWidget {
         ? 0
         : ((initialPrice - discountedPrice) / initialPrice * 100).round();
 
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColor.grayColor3,
-        borderRadius: BorderRadius.circular(15),
-      ),
-      padding: const EdgeInsets.all(12),
-      child: Row(
-        children: [
-          Expanded(
-            child: Image.asset(AppAssets.donut, fit: BoxFit.fill),
-          ),
+    return SingleChildScrollView(
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColor.grayColor3,
+          borderRadius: BorderRadius.circular(15),
+        ),
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            Expanded(child: Image.asset(AppAssets.donut, fit: BoxFit.fill)),
 
-          const SizedBox(width: 12),
+            const SizedBox(width: 12),
 
-          Expanded(
-            flex: 2,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        dealData['title'] ?? 'Item',
-                        style: AppStyle.bold18orange,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-
-                    GestureDetector(
-                      onTap: () {
-                        favProvider.toggleFavorite(id);
-
-                        DialogUtils.showMessage(
-                          context: context,
-                          message: favProvider.isFavorite(id)
-                              ? "Added to favorites"
-                              : "Removed from favorites",
-                        );
-                      },
-                      child: Icon(
-                        isFav ? Icons.favorite : Icons.favorite_border,
-                        color: AppColor.orange,
-                      ),
-                    ),
-                  ],
-                ),
-
-                Text(
-                  dealData['location'] ?? '',
-                  style: AppStyle.medium14ramdi,
-                ),
-
-                Row(
-                  children: [
-                    Text(
-                      '\$${discountedPrice.toStringAsFixed(2)}',
-                      style: AppStyle.bold20orange,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      '-$percent%',
-                      style: AppStyle.bold18orange.copyWith(
-                        color: Colors.green,
-                      ),
-                    ),
-                  ],
-                ),
-
-                Text(
-                  '\$${initialPrice.toStringAsFixed(2)}',
-                  style: AppStyle.medium14ramdi.copyWith(
-                    decoration: TextDecoration.lineThrough,
-                  ),
-                ),
-
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) =>
-                            DetailsScreen(dealData: dealData),
-                      ),
-                    );
-                  },
-                  child: Row(
+            Expanded(
+              flex: 2,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
                     children: [
-                      Text('View Details',
-                          style: AppStyle.medium14orange),
-                      const Icon(
-                        Icons.arrow_forward_ios,
-                        size: 12,
-                        color: AppColor.orange,
+                      Expanded(
+                        child: Text(
+                          dealData['title'] ?? 'Item',
+                          style: AppStyle.bold18orange,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+
+                      GestureDetector(
+                        onTap: () {
+                          favProvider.toggleFavorite(id);
+
+                          DialogUtils.showMessage(
+                            context: context,
+                            message: favProvider.isFavorite(id)
+                                ? "Added to favorites"
+                                : "Removed from favorites",
+                          );
+                        },
+                        child: Icon(
+                          isFav ? Icons.favorite : Icons.favorite_border,
+                          color: AppColor.orange,
+                        ),
                       ),
                     ],
                   ),
-                ),
-              ],
+
+                  Text(
+                    dealData['location'] ?? '',
+                    style: AppStyle.medium14ramdi,
+                  ),
+
+                  Row(
+                    children: [
+                      Text(
+                        '\$${discountedPrice.toStringAsFixed(2)}',
+                        style: AppStyle.bold20orange,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        '-$percent%',
+                        style: AppStyle.bold18orange.copyWith(
+                          color: Colors.green,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  Text(
+                    '\$${initialPrice.toStringAsFixed(2)}',
+                    style: AppStyle.medium14ramdi.copyWith(
+                      decoration: TextDecoration.lineThrough,
+                    ),
+                  ),
+
+                  GestureDetector(
+                    onTap: () {
+                      final dataWithId = {...dealData, 'id': id};
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => DetailsScreen(dealData: dataWithId),
+                        ),
+                      );
+                    },
+                    child: Row(
+                      children: [
+                        Text('View Details', style: AppStyle.medium14orange),
+                        const Icon(
+                          Icons.arrow_forward_ios,
+                          size: 12,
+                          color: AppColor.orange,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

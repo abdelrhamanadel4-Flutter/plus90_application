@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_floating_bottom_bar/flutter_floating_bottom_bar.dart';
 
 import 'package:plus90_application/Home/user/tabs/cart/cart.dart';
-import 'package:plus90_application/Home/user/tabs/home.dart';
-import 'package:plus90_application/Home/user/tabs/profile.dart';
+import 'package:plus90_application/Home/user/tabs/Home/home.dart';
+import 'package:plus90_application/Home/user/tabs/profile/profile.dart';
 import 'package:plus90_application/screens/catgory.dart';
 import 'package:plus90_application/utils/AppRoutes.dart';
 import 'package:plus90_application/utils/app-assets.dart';

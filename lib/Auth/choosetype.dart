@@ -40,25 +40,19 @@ class _ChoosetypeState extends State<Choosetype> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               SizedBox(height: height(context) * 0.03),
-
               Text('How will you use +90?', style: AppStyle.bold24black),
-
               SizedBox(height: height(context) * 0.01),
-
               Text(
-                'Choose the account type that fits your needs. You can’t change this later',
+                'Choose the account type that fits your needs. You can\'t change this later',
                 style: AppStyle.semibold14black,
               ),
-
               SizedBox(height: height(context) * 0.03),
 
               AccountCard(
                 title: "Individual Account",
                 subtitle: "User",
                 isSelected: selectedIndex == 0,
-                onTap: () {
-                  setState(() => selectedIndex = 0);
-                },
+                onTap: () => setState(() => selectedIndex = 0),
                 features: [
                   "Buy & Sell: Browse deals or list items.",
                   "Community: Connect with people nearby.",
@@ -70,9 +64,7 @@ class _ChoosetypeState extends State<Choosetype> {
                 title: "Business Account",
                 subtitle: "Store",
                 isSelected: selectedIndex == 1,
-                onTap: () {
-                  setState(() => selectedIndex = 1);
-                },
+                onTap: () => setState(() => selectedIndex = 1),
                 features: [
                   "Sell Only: List store products.",
                   "Verified Badge: Build trust.",
@@ -86,6 +78,15 @@ class _ChoosetypeState extends State<Choosetype> {
                 text: 'Get Started',
                 textStyle: AppStyle.semibold20white,
                 onPressed: () async {
+                  if (selectedIndex == -1) {
+                    DialogUtils.showMessage(
+                      context: context,
+                      title: "Warning",
+                      message: "Please select account type",
+                    );
+                    return;
+                  }
+
                   try {
                     var user = FirebaseAuth.instance.currentUser;
 
@@ -98,46 +99,29 @@ class _ChoosetypeState extends State<Choosetype> {
                       return;
                     }
 
-                    if (selectedIndex == -1) {
-                      DialogUtils.showMessage(
-                        context: context,
-                        title: "Warning",
-                        message: "Please select account type",
-                      );
-                      return;
-                    }
-
                     DialogUtils.showLoading(
                       context: context,
                       loadingText: "Saving data...",
                     );
 
-                    /// ✅ Update user role in Firestore
+                    // ✅ حفظ الـ role صح
                     await FirebaseFirestore.instance
                         .collection('users')
                         .doc(user.uid)
                         .update({
-                      "role": selectedIndex == 0 ? "user" : "store",
-                    });
+                          "role": selectedIndex == 0 ? "user" : "store",
+                        });
 
                     DialogUtils.hideLoading(context: context);
 
-                    DialogUtils.showMessage(
-                      context: context,
-                      title: "Success",
-                      message: "Account type saved successfully",
-                      posActionName: "OK",
-                      posAction: () {
-                        Navigator.pushNamedAndRemoveUntil(
-                          context,
-                          Approutes.login,
-                          (route) => false,
-                        );
-                      },
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      Approutes.login,
+                      (route) => false,
+                      arguments: user.uid,
                     );
                   } catch (e) {
                     DialogUtils.hideLoading(context: context);
-
                     DialogUtils.showMessage(
                       context: context,
                       title: "Error",

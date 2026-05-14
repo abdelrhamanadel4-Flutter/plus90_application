@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:plus90_application/screens/incomingorder/IncomingOrder.dart';
 import 'package:plus90_application/screens/AddItem.dart';
@@ -13,6 +17,7 @@ class SellScreen extends StatefulWidget {
 
 class _SellScreenState extends State<SellScreen> {
   int selectedIndex = 0;
+  final user = FirebaseAuth.instance.currentUser;
 
   final List<Widget> pages = const [IncomingOrder(), AddItem(), MyItems()];
   final List<String> tabs = ["Incoming Orders", "Add Items", "My Items"];
@@ -23,7 +28,7 @@ class _SellScreenState extends State<SellScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            /// 🔝 HEADER (ثابت)
+            /// 🔝 HEADER
             Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
@@ -32,7 +37,6 @@ class _SellScreenState extends State<SellScreen> {
                   CircleAvatar(
                     radius: 22,
                     backgroundColor: Colors.white,
-
                     child: IconButton(
                       icon: const Icon(
                         Icons.arrow_back_ios_new,
@@ -44,18 +48,72 @@ class _SellScreenState extends State<SellScreen> {
                       },
                     ),
                   ),
-                  const SizedBox(height: 10),
                   const SizedBox(width: 16),
-                  const CircleAvatar(radius: 22),
+
+                  /// 👤 USER IMAGE
+                  CircleAvatar(
+                    radius: 22,
+                    backgroundColor: Colors.white,
+                    child: ClipOval(
+                      child: StreamBuilder<DocumentSnapshot>(
+                        stream: FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(user!.uid)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData || !snapshot.data!.exists) {
+                            return const Icon(
+                              Icons.person,
+                              size: 40,
+                              color: Colors.grey,
+                            );
+                          }
+                          final data =
+                              snapshot.data!.data() as Map<String, dynamic>;
+                          final photoURL = (data['photoURL'] ?? "")
+                              .toString()
+                              .trim();
+                          return _buildProfileImage(photoURL);
+                        },
+                      ),
+                    ),
+                  ),
                   const SizedBox(width: 10),
 
                   /// 📝 USER INFO
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text("Shrouk Mohamed"),
-                      Text("Owner", style: TextStyle(color: Colors.grey)),
-                    ],
+                  StreamBuilder<DocumentSnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(user!.uid)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData || !snapshot.data!.exists) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            Text("User"),
+                            Text("Owner", style: TextStyle(color: Colors.grey)),
+                          ],
+                        );
+                      }
+                      final data =
+                          snapshot.data!.data() as Map<String, dynamic>;
+                      final displayName =
+                          (data['name'] ?? data['displayName'] ?? "User")
+                              .toString();
+                      final role = (data['role'] ?? "Owner").toString();
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(displayName),
+                          Text(
+                            role,
+                            style: const TextStyle(color: Colors.grey),
+                          ),
+                        ],
+                      );
+                    },
                   ),
 
                   const Spacer(),
@@ -70,7 +128,6 @@ class _SellScreenState extends State<SellScreen> {
                         ),
                       );
                     },
-
                     child: Container(
                       width: 50,
                       height: 50,
@@ -85,7 +142,6 @@ class _SellScreenState extends State<SellScreen> {
                           ),
                         ],
                       ),
-
                       child: const Center(
                         child: Icon(
                           Icons.notifications_none,
@@ -99,7 +155,7 @@ class _SellScreenState extends State<SellScreen> {
               ),
             ),
 
-            /// 🟪 TABS (ثابتة)
+            /// 🟪 TABS
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 16),
               padding: const EdgeInsets.all(6),
@@ -123,7 +179,7 @@ class _SellScreenState extends State<SellScreen> {
                             padding: const EdgeInsets.symmetric(
                               vertical: 8,
                               horizontal: 25,
-                            ), // 👈 المربع البنفسجي أصغر
+                            ),
                             decoration: BoxDecoration(
                               color: selectedIndex == index
                                   ? const Color(0xFF8B1E3F)
@@ -133,7 +189,7 @@ class _SellScreenState extends State<SellScreen> {
                             child: Text(
                               tabs[index],
                               style: TextStyle(
-                                fontSize: 12, // 👈 الخط أكبر
+                                fontSize: 12,
                                 fontWeight: FontWeight.w600,
                                 color: selectedIndex == index
                                     ? Colors.white
@@ -150,11 +206,40 @@ class _SellScreenState extends State<SellScreen> {
             ),
             const SizedBox(height: 15),
 
-            /// 📄 CONTENT (اللي بيتغير)
+            /// 📄 CONTENT
             Expanded(child: pages[selectedIndex]),
           ],
         ),
       ),
     );
   }
+}
+
+Widget _buildProfileImage(String? photoURL) {
+  if (photoURL == null || photoURL.isEmpty) {
+    return const Center(
+      child: Icon(Icons.person, size: 40, color: Colors.white),
+    );
+  }
+
+  if (photoURL.startsWith('data:image')) {
+    try {
+      final base64Str = photoURL.split(',').last;
+      return Image.memory(
+        base64Decode(base64Str),
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) =>
+            const Icon(Icons.person, size: 40, color: Colors.white),
+      );
+    } catch (_) {
+      return const Icon(Icons.person, size: 40, color: Colors.white);
+    }
+  }
+
+  return Image.network(
+    photoURL,
+    fit: BoxFit.cover,
+    errorBuilder: (_, __, ___) =>
+        const Icon(Icons.person, size: 40, color: Colors.white),
+  );
 }

@@ -66,7 +66,7 @@ class Login extends StatelessWidget {
                       r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
                     ).hasMatch(text);
                     if (!emailValid) {
-                      return 'Please enter Vaild Email';
+                      return 'Please enter Valid Email';
                     }
                     return null;
                   },
@@ -94,7 +94,6 @@ class Login extends StatelessWidget {
                     Spacer(),
                     TextButton(
                       onPressed: () {},
-
                       child: Text(
                         'Forgot Password?',
                         style: AppStyle.medium15orange,
@@ -103,11 +102,9 @@ class Login extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: height(context) * 0.05),
-
                 CustomElevatedButton(
                   onPressed: () {
                     login(context);
-                    // Handle login logic here
                   },
                   text: 'Login ',
                   textStyle: AppStyle.semibold20white,
@@ -123,18 +120,14 @@ class Login extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     GestureDetector(
-                      onTap: () {
-                        // Handle Google login logic here
-                      },
+                      onTap: () {},
                       child: Image.asset(AppAssets.google),
                     ),
                     SizedBox(width: width(context) * 0.05),
                     Image.asset(AppAssets.facebook),
                     SizedBox(width: width(context) * 0.05),
                     GestureDetector(
-                      onTap: () {
-                        // Handle Apple login logic here
-                      },
+                      onTap: () {},
                       child: Image.asset(AppAssets.apple),
                     ),
                   ],
@@ -153,15 +146,13 @@ class Login extends StatelessWidget {
     DialogUtils.showLoading(context: context, loadingText: 'Logging in...');
 
     try {
-      /// 🔐 Firebase Login
       final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: email.text,
-        password: password.text,
+        email: email.text.trim(),
+        password: password.text.trim(),
       );
 
       final uid = credential.user!.uid;
 
-      /// 📦 Get user data
       var doc = await FirebaseFirestore.instance
           .collection('users')
           .doc(uid)
@@ -169,22 +160,37 @@ class Login extends StatelessWidget {
 
       DialogUtils.hideLoading(context: context);
 
+      // ✅ بنقرأ "role" مش "accountType"
+      String role = doc.data()?['role'] ?? "not_selected";
+
+      // ✅ لو لسه معملش اختيار
+      if (role == "not_selected") {
+        DialogUtils.showMessage(
+          context: context,
+          message: 'Please choose your account type first',
+          title: 'Warning',
+          posActionName: 'OK',
+          posAction: () {
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              Approutes.Choosetype,
+              (route) => false,
+            );
+          },
+        );
+        return;
+      }
+
+      double? lat = (doc.data()?['lat'] as num?)?.toDouble();
+      double? lng = (doc.data()?['lng'] as num?)?.toDouble();
+
       DialogUtils.showMessage(
         context: context,
         message: 'Login Successfully',
         title: 'Success',
         posActionName: 'OK',
-
         posAction: () {
-          /// 👤 account type
-          String accountType = doc.data()?['accountType'] ?? "user";
-
-          /// 📍 location
-          double? lat = (doc.data()?['lat'] as num?)?.toDouble();
-
-          double? lng = (doc.data()?['lng'] as num?)?.toDouble();
-
-          /// 🚨 IF NO LOCATION
+          // ✅ لو معندوش location
           if (lat == null || lng == null) {
             Navigator.pushNamedAndRemoveUntil(
               context,
@@ -192,20 +198,16 @@ class Login extends StatelessWidget {
               (route) => false,
               arguments: uid,
             );
-
             return;
           }
 
-          /// 👤 USER HOME
-          if (accountType == "user") {
+          if (role == "user") {
             Navigator.pushNamedAndRemoveUntil(
               context,
               Approutes.HomeScreen,
               (route) => false,
             );
-          }
-          /// 🏪 STORE HOME
-          else {
+          } else {
             Navigator.pushNamedAndRemoveUntil(
               context,
               Approutes.HomescreanStore,
@@ -216,7 +218,6 @@ class Login extends StatelessWidget {
       );
     } on FirebaseAuthException catch (e) {
       DialogUtils.hideLoading(context: context);
-
       DialogUtils.showMessage(
         context: context,
         message: e.message ?? "Login Failed",

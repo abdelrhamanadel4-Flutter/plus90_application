@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:plus90_application/screens/notification_screen.dart';
 import 'package:plus90_application/utils/app-assets.dart';
@@ -321,38 +322,48 @@ class Homestore extends StatelessWidget {
                   child: Text("Active Now", style: AppStyle.bold20orange),
                 ),
 
-              StreamBuilder(
-  stream: FirebaseFirestore.instance.collection("deals").snapshots(),
-  builder: (context, snapshot) {
-    if (snapshot.connectionState == ConnectionState.waiting) {
-      return Center(child: CircularProgressIndicator());
-    }
+                // استبدل الـ StreamBuilder بالكود ده:
+                StreamBuilder(
+                  stream: FirebaseFirestore.instance
+                      .collection("deals")
+                      .where(
+                        "uid",
+                        isEqualTo: FirebaseAuth.instance.currentUser!.uid,
+                      )
+                      .where("expiry", isGreaterThan: Timestamp.now())
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    }
 
-    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-      return Center(child: Text("No Deals Found"));
-    }
+                    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                      return Center(child: Text("No Active Deals"));
+                    }
 
-    final deals = snapshot.data!.docs;
+                    final deals = snapshot.data!.docs;
 
-    return ListView.builder(
-      itemCount: deals.length,
-      shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
-      padding: EdgeInsets.symmetric(horizontal: width(context) * 0.04),
-      itemBuilder: (context, index) {
-        final data = deals[index].data();
-        final doc = deals[index];
-        final id = doc.id;
+                    return ListView.builder(
+                      itemCount: deals.length,
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: width(context) * 0.04,
+                      ),
+                      itemBuilder: (context, index) {
+                        final data = deals[index].data();
+                        final id = deals[index].id;
 
-        return Padding(
-          padding: EdgeInsets.only(bottom: height(context) * 0.015),
-          child: CardItem(dealData: data,
-          id: id,), // 🔥 هنا بنبعت الداتا من Firestore
-        );
-      },
-    );
-  },
-),
+                        return Padding(
+                          padding: EdgeInsets.only(
+                            bottom: height(context) * 0.015,
+                          ),
+                          child: CardItem(dealData: data, id: id),
+                        );
+                      },
+                    );
+                  },
+                ),
               ],
             ),
           ],
