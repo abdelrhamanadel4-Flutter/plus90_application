@@ -195,7 +195,7 @@ class SupportScreen extends StatelessWidget {
               const Spacer(),
 
               const Center(
-                child: const Text(
+                child: Text(
                   "Need more help? Contact our support team.",
                   style: TextStyle(color: Colors.grey),
                 ),

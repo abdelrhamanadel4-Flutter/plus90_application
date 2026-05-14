@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:plus90_application/screens/notification_screen.dart';
 import 'package:plus90_application/utils/app-assets.dart';
@@ -6,6 +7,8 @@ import 'package:plus90_application/utils/app_style.dart';
 import 'package:plus90_application/Home/card_item.dart';
 
 class Homestore extends StatelessWidget {
+  const Homestore({super.key});
+
   height(context) => MediaQuery.of(context).size.height;
 
   width(context) => MediaQuery.of(context).size.width;
@@ -318,18 +321,38 @@ class Homestore extends StatelessWidget {
                   child: Text("Active Now", style: AppStyle.bold20orange),
                 ),
 
-                ListView.builder(
-                  itemBuilder: (context, index) => Padding(
-                    padding: EdgeInsets.symmetric(
-                      vertical: width(context) * 0.015,
-                    ),
-                    child: CardItem(),
-                  ),
-                  itemCount: 3,
-                  padding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-                  physics: NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                ),
+              StreamBuilder(
+  stream: FirebaseFirestore.instance.collection("deals").snapshots(),
+  builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return Center(child: CircularProgressIndicator());
+    }
+
+    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+      return Center(child: Text("No Deals Found"));
+    }
+
+    final deals = snapshot.data!.docs;
+
+    return ListView.builder(
+      itemCount: deals.length,
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      padding: EdgeInsets.symmetric(horizontal: width(context) * 0.04),
+      itemBuilder: (context, index) {
+        final data = deals[index].data();
+        final doc = deals[index];
+        final id = doc.id;
+
+        return Padding(
+          padding: EdgeInsets.only(bottom: height(context) * 0.015),
+          child: CardItem(dealData: data,
+          id: id,), // 🔥 هنا بنبعت الداتا من Firestore
+        );
+      },
+    );
+  },
+),
               ],
             ),
           ],

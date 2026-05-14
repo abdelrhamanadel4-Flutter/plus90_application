@@ -1,19 +1,76 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:plus90_application/utils/app-assets.dart';
 import 'package:plus90_application/utils/app_color.dart';
 import 'package:plus90_application/utils/app_style.dart';
 
 class CardMyItem extends StatefulWidget {
-  const CardMyItem({super.key});
+  final String title;
+  final String location;
+  final String initialPrice;
+  final String discountedPrice;
+  final String? imageUrl;
+  final DateTime? expiryDate;
+
+  const CardMyItem({
+    super.key,
+    required this.title,
+    required this.location,
+    required this.initialPrice,
+    required this.discountedPrice,
+    this.imageUrl,
+    this.expiryDate,
+  });
 
   @override
   State<CardMyItem> createState() => _CardMyItemState();
 }
 
 class _CardMyItemState extends State<CardMyItem> {
-  height(context) => MediaQuery.of(context).size.height;
+  Timer? _timer;
+  Duration _remaining = Duration.zero;
 
+  height(context) => MediaQuery.of(context).size.height;
   width(context) => MediaQuery.of(context).size.width;
+
+  @override
+  void initState() {
+    super.initState();
+    _updateRemaining();
+    // يحدث الـ timer كل ثانية
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      _updateRemaining();
+    });
+  }
+
+  void _updateRemaining() {
+    if (widget.expiryDate == null) return;
+    final now = DateTime.now();
+    final diff = widget.expiryDate!.difference(now);
+    setState(() {
+      _remaining = diff.isNegative ? Duration.zero : diff;
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  bool get isActive =>
+      widget.expiryDate != null &&
+      widget.expiryDate!.isAfter(DateTime.now());
+
+  String get timerText {
+    if (widget.expiryDate == null) return '--:--:--';
+    if (!isActive) return '00:00:00';
+
+    final h = _remaining.inHours.toString().padLeft(2, '0');
+    final m = (_remaining.inMinutes % 60).toString().padLeft(2, '0');
+    final s = (_remaining.inSeconds % 60).toString().padLeft(2, '0');
+    return '$h:$m:$s';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,29 +79,29 @@ class _CardMyItemState extends State<CardMyItem> {
         horizontal: width(context) * 0.03,
         vertical: height(context) * 0.01,
       ),
-
       decoration: BoxDecoration(
         color: AppColor.grayColor3,
         borderRadius: BorderRadius.circular(20),
       ),
-
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
-
         children: [
           /// image
           Container(
             height: height(context) * 0.12,
             width: width(context) * 0.26,
-
             decoration: BoxDecoration(
               color: AppColor.whiteColor,
               borderRadius: BorderRadius.circular(18),
-
-              image: DecorationImage(
-                image: AssetImage(AppAssets.donut),
-                fit: BoxFit.cover,
-              ),
+              image: widget.imageUrl != null
+                  ? DecorationImage(
+                      image: NetworkImage(widget.imageUrl!),
+                      fit: BoxFit.cover,
+                    )
+                  : DecorationImage(
+                      image: AssetImage(AppAssets.donut),
+                      fit: BoxFit.cover,
+                    ),
             ),
           ),
 
@@ -54,28 +111,21 @@ class _CardMyItemState extends State<CardMyItem> {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-
               children: [
                 /// title + edit
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
-
                   children: [
                     Expanded(
                       child: Text(
-                        'Unicorn Sprinkles',
+                        widget.title,
                         style: AppStyle.bold18orange,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-
-                    /// edit icon
                     GestureDetector(
-                      onTap: () {
-                        /// edit action
-                      },
-
+                      onTap: () {},
                       child: Image.asset(
                         AppAssets.edit,
                         color: AppColor.orange,
@@ -94,12 +144,10 @@ class _CardMyItemState extends State<CardMyItem> {
                       color: AppColor.grayColor2,
                       size: width(context) * 0.045,
                     ),
-
                     SizedBox(width: width(context) * 0.01),
-
                     Expanded(
                       child: Text(
-                        'Grand Hotel, 2.5km away',
+                        widget.location,
                         style: AppStyle.medium11ramdi,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -112,25 +160,27 @@ class _CardMyItemState extends State<CardMyItem> {
                 /// price + status
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
-
                   children: [
-                    Text('\$72.00', style: AppStyle.bold20orange),
-
+                    Text(
+                      '\$${widget.discountedPrice}',
+                      style: AppStyle.bold20orange,
+                    ),
                     const Spacer(),
 
+                    /// ✅ Status ديناميكي
                     Container(
                       padding: EdgeInsets.symmetric(
                         horizontal: width(context) * 0.05,
                         vertical: height(context) * 0.008,
                       ),
-
                       decoration: BoxDecoration(
-                        color: const Color(0xFF7ED36E),
+                        color: isActive
+                            ? const Color(0xFF7ED36E)   // أخضر = Active
+                            : const Color(0xFFD70000),  // أحمر = Expired
                         borderRadius: BorderRadius.circular(20),
                       ),
-
                       child: Text(
-                        'Active',
+                        isActive ? 'Active' : 'Expired',
                         style: AppStyle.bold12white.copyWith(
                           fontSize: width(context) * 0.035,
                         ),
@@ -143,13 +193,11 @@ class _CardMyItemState extends State<CardMyItem> {
 
                 /// old price
                 Text(
-                  '\$120.00',
+                  '\$${widget.initialPrice}',
                   style: AppStyle.medium14ramdi.copyWith(
                     decoration: TextDecoration.lineThrough,
                   ),
                 ),
-
-                SizedBox(width: width(context) * 0.03),
 
                 SizedBox(height: height(context) * 0.01),
 
@@ -157,28 +205,24 @@ class _CardMyItemState extends State<CardMyItem> {
                 Row(
                   children: [
                     Text(
-                      'Ends In',
+                      isActive ? 'Ends In' : 'Expired',
                       style: TextStyle(
-                        color: Color(0xffD70000),
+                        color: const Color(0xffD70000),
                         fontWeight: FontWeight.bold,
                         fontSize: width(context) * 0.045,
                       ),
                     ),
-
                     SizedBox(width: width(context) * 0.02),
-
                     Icon(
                       Icons.access_time_outlined,
-                      color: Color(0xffD70000),
+                      color: const Color(0xffD70000),
                       size: width(context) * 0.05,
                     ),
-
                     SizedBox(width: width(context) * 0.02),
-
                     Text(
-                      '08:15:29',
+                      timerText,
                       style: TextStyle(
-                        color: Color(0xffD70000),
+                        color: const Color(0xffD70000),
                         fontWeight: FontWeight.bold,
                         fontSize: width(context) * 0.045,
                       ),

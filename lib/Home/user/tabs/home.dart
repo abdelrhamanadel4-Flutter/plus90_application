@@ -1,7 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:plus90_application/Home/card_item.dart';
-import 'package:plus90_application/screens/catgory.dart';
-import 'package:plus90_application/screens/scan_screen.dart';
 import 'package:plus90_application/screens/notification_screen.dart';
 import 'package:plus90_application/utils/AppRoutes.dart';
 import 'package:plus90_application/utils/app-assets.dart';
@@ -218,17 +217,38 @@ class _HomeUIState extends State<HomeUI> {
                   sectionTitle("Stores Nearby"),
 
                   const SizedBox(height: 10),
-                  ListView.builder(
-                    itemBuilder: (context, index) => Padding(
-                      padding: EdgeInsets.symmetric(
-                        vertical: width(context) * 0.015,
-                      ),
-                      child: CardItem(),
-                    ),
-                    itemCount: 6,
-                    physics: NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                  ),
+                 StreamBuilder(
+  stream: FirebaseFirestore.instance.collection("deals").snapshots(),
+  builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return Center(child: CircularProgressIndicator());
+    }
+
+    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+      return Center(child: Text("No Deals Found"));
+    }
+
+    final deals = snapshot.data!.docs;
+
+    return ListView.builder(
+      itemCount: deals.length,
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      padding: EdgeInsets.symmetric(horizontal: width(context) * 0.04),
+      itemBuilder: (context, index) {
+        final data = deals[index].data();
+        final doc = deals[index];
+        final id = doc.id;
+
+        return Padding(
+          padding: EdgeInsets.only(bottom: height(context) * 0.015),
+          child: CardItem(dealData: data,
+          id: id,), // 🔥 هنا بنبعت الداتا من Firestore
+        );
+      },
+    );
+  },
+),
 
                   const SizedBox(height: 20),
                   const SizedBox(height: 20),

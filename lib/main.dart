@@ -8,16 +8,18 @@ import 'package:plus90_application/Auth/registers.dart';
 import 'package:plus90_application/Home/store/homeScrean_store.dart';
 import 'package:plus90_application/Home/user/homeScrean.dart';
 import 'package:plus90_application/Home/user/tabs/cart/orderconfirmed.dart';
+import 'package:plus90_application/Provider/cart_provider.dart';
+import 'package:plus90_application/Provider/fav_provider.dart';
 import 'package:plus90_application/Splach/splachScrean.dart';
 import 'package:plus90_application/firebase_options.dart';
 import 'package:plus90_application/onBorading/onboradingpages.dart';
 import 'package:plus90_application/screens/AddItem.dart';
 import 'package:plus90_application/screens/catgory.dart';
-import 'package:plus90_application/screens/deatils_scean.dart';
 import 'package:plus90_application/screens/myorders.dart';
 import 'package:plus90_application/screens/sell_screen.dart';
 import 'package:plus90_application/utils/AppRoutes.dart';
 import 'package:plus90_application/utils/app.theme.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,7 +28,14 @@ void main() async {
 
   GoogleFonts.config.allowRuntimeFetching = true;
 
-  runApp(MyApp());
+  runApp( MultiProvider(
+      providers: [
+                ChangeNotifierProvider(create: (_) => FavoritesProvider()),
+
+        ChangeNotifierProvider(create: (_) => CartProvider()),
+      ],
+      child: MyApp(),
+    ),);
 }
 
 class MyApp extends StatelessWidget {
@@ -47,7 +56,7 @@ class MyApp extends StatelessWidget {
         Approutes.registers: (context) => (Registers()),
         Approutes.HomeScreen: (context) => (HomeScreen()),
         Approutes.HomescreanStore: (context) => (HomescreanStore()),
-        Approutes.DeatilsScrean: (context) => (DeatilsScrean()),
+    
         Approutes.Myorders: (context) => (Myorders()),
         Approutes.Categories: (context) => (Categories()),
         Approutes.orderconfirmed: (context) => (OrderConfirmed()),

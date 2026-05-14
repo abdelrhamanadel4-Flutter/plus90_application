@@ -1,45 +1,54 @@
 import 'package:flutter/material.dart';
-import 'package:plus90_application/utils/AppRoutes.dart';
+import 'package:provider/provider.dart';
+import 'package:plus90_application/Provider/fav_provider.dart';
+import 'package:plus90_application/screens/deatils_scean.dart';
 import 'package:plus90_application/utils/Dialog_utils.dart';
 import 'package:plus90_application/utils/app-assets.dart';
 import 'package:plus90_application/utils/app_color.dart';
 import 'package:plus90_application/utils/app_style.dart';
 
-class CardItem extends StatefulWidget {
-  @override
-  State<CardItem> createState() => _CardItemState();
-}
+class CardItem extends StatelessWidget {
+  final Map<String, dynamic> dealData;
+  final String id;
+  final bool forceFav;
 
-class _CardItemState extends State<CardItem> {
-  height(context) => MediaQuery.of(context).size.height;
-
-  width(context) => MediaQuery.of(context).size.width;
-
-  bool isfav = false;
+  const CardItem({
+    super.key,
+    required this.dealData,
+    required this.id,
+    this.forceFav = false,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final favProvider = Provider.of<FavoritesProvider>(context);
+
+    final isFav = forceFav || favProvider.isFavorite(id);
+
+    final initialPrice =
+        double.tryParse(dealData['initialPrice']?.toString() ?? '0') ?? 0;
+
+    final discountedPrice =
+        double.tryParse(dealData['discountedPrice']?.toString() ?? '0') ?? 0;
+
+    final percent = initialPrice == 0
+        ? 0
+        : ((initialPrice - discountedPrice) / initialPrice * 100).round();
+
     return Container(
       decoration: BoxDecoration(
         color: AppColor.grayColor3,
         borderRadius: BorderRadius.circular(15),
       ),
-      padding: EdgeInsets.symmetric(
-        horizontal: width(context) * 0.04,
-        vertical: height(context) * 0.02,
-      ),
+      padding: const EdgeInsets.all(12),
       child: Row(
         children: [
           Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppColor.whiteColor,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Image.asset(AppAssets.donut, fit: BoxFit.fill),
-            ),
+            child: Image.asset(AppAssets.donut, fit: BoxFit.fill),
           ),
-          SizedBox(width: width(context) * 0.04),
+
+          const SizedBox(width: 12),
+
           Expanded(
             flex: 2,
             child: Column(
@@ -47,62 +56,77 @@ class _CardItemState extends State<CardItem> {
               children: [
                 Row(
                   children: [
-                    Text('Unicorn Sprinkles', style: AppStyle.bold18orange),
-                    Spacer(),
-                    GestureDetector(
-                      child: Icon(
-                        isfav ? Icons.favorite : Icons.favorite_border,
-                        color: AppColor.orange,
+                    Expanded(
+                      child: Text(
+                        dealData['title'] ?? 'Item',
+                        style: AppStyle.bold18orange,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
+                    ),
+
+                    GestureDetector(
                       onTap: () {
-                        setState(() {
-                          isfav = !isfav;
-                        });
+                        favProvider.toggleFavorite(id);
+
                         DialogUtils.showMessage(
                           context: context,
-                          message: isfav
+                          message: favProvider.isFavorite(id)
                               ? "Added to favorites"
-                              : "Remove from favorites",
+                              : "Removed from favorites",
                         );
-
-                        // Handle favorite action
                       },
+                      child: Icon(
+                        isFav ? Icons.favorite : Icons.favorite_border,
+                        color: AppColor.orange,
+                      ),
                     ),
                   ],
                 ),
-                SizedBox(height: height(context) * 0.01),
-                Text('Grand Hotel, 2.5km away', style: AppStyle.medium14ramdi),
-                SizedBox(height: height(context) * 0.01),
+
+                Text(
+                  dealData['location'] ?? '',
+                  style: AppStyle.medium14ramdi,
+                ),
+
                 Row(
                   children: [
-                    Text('\$72.00', style: AppStyle.bold20orange),
-                    Spacer(),
-                    Row(
-                      children: [
-                        Image.asset(
-                          AppAssets.clock,
-                          height: height(context) * 0.015,
-                        ),
-                        SizedBox(width: width(context) * 0.01),
-                        Text('08:15:29', style: AppStyle.bold12orange),
-                      ],
+                    Text(
+                      '\$${discountedPrice.toStringAsFixed(2)}',
+                      style: AppStyle.bold20orange,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      '-$percent%',
+                      style: AppStyle.bold18orange.copyWith(
+                        color: Colors.green,
+                      ),
                     ),
                   ],
                 ),
+
                 Text(
-                  '\$150',
+                  '\$${initialPrice.toStringAsFixed(2)}',
                   style: AppStyle.medium14ramdi.copyWith(
                     decoration: TextDecoration.lineThrough,
                   ),
                 ),
+
                 GestureDetector(
                   onTap: () {
-                    Navigator.pushNamed(context, Approutes.DeatilsScrean);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            DetailsScreen(dealData: dealData),
+                      ),
+                    );
                   },
                   child: Row(
                     children: [
-                      Text('View Details', style: AppStyle.medium14orange),
-                      Icon(
+                      Text('View Details',
+                          style: AppStyle.medium14orange),
+                      const Icon(
                         Icons.arrow_forward_ios,
                         size: 12,
                         color: AppColor.orange,

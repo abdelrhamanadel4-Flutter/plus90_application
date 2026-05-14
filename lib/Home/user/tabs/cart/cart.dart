@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:plus90_application/Provider/cart_provider.dart';
 import 'package:plus90_application/Home/user/tabs/cart/card_cart.dart';
 import 'package:plus90_application/utils/AppRoutes.dart';
 import 'package:plus90_application/utils/app-assets.dart';
@@ -8,11 +10,14 @@ import 'package:plus90_application/utils/custom-elveted-buttom.dart';
 class CartTab extends StatelessWidget {
   const CartTab({super.key});
 
-  height(context) => MediaQuery.of(context).size.height;
-  width(context) => MediaQuery.of(context).size.width;
+  double height(context) => MediaQuery.of(context).size.height;
+  double width(context) => MediaQuery.of(context).size.width;
 
   @override
   Widget build(BuildContext context) {
+    final cartProvider = Provider.of<CartProvider>(context);
+    final items = cartProvider.items.values.toList();
+
     return SafeArea(
       child: Scaffold(
         body: Padding(
@@ -22,14 +27,10 @@ class CartTab extends StatelessWidget {
           ),
           child: ListView(
             children: [
-              /// 🔹 الهيدر
               Row(
                 children: [
                   IconButton(
-                    icon: const Icon(
-                      Icons.arrow_back_ios_outlined,
-                      color: Colors.black,
-                    ),
+                    icon: const Icon(Icons.arrow_back_ios_outlined),
                     onPressed: () =>
                         Navigator.pushNamed(context, Approutes.HomeScreen),
                   ),
@@ -37,14 +38,13 @@ class CartTab extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text("Your Cart", style: AppStyle.bold20orange),
-                      SizedBox(height: height(context) * 0.002),
                       Text(
-                        "3 items in your cart",
+                        "${items.length} items in your cart",
                         style: AppStyle.medium11ramdi,
                       ),
                     ],
                   ),
-                  Spacer(),
+                  const Spacer(),
                   Image.asset(
                     AppAssets.header_cart,
                     height: height(context) * 0.05,
@@ -55,14 +55,17 @@ class CartTab extends StatelessWidget {
               SizedBox(height: height(context) * 0.03),
 
               ListView.builder(
-                itemBuilder: (context, index) => Padding(
-                  padding: EdgeInsets.only(bottom: height(context) * 0.02),
-                  child: CardCart(),
-                ),
-                itemCount: 3,
-
+                itemCount: items.length,
                 shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
+                itemBuilder: (context, index) {
+                  final item = items[index];
+
+                  return Padding(
+                    padding: EdgeInsets.only(bottom: height(context) * 0.02),
+                    child: CardCart(id: item.id),
+                  );
+                },
               ),
 
               SizedBox(height: height(context) * 0.02),
@@ -71,28 +74,24 @@ class CartTab extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("Subtotal", style: AppStyle.medium14ramdi),
-                  Text("\$150.00", style: AppStyle.semibold14black),
+                  Text("\$${cartProvider.totalPrice.toStringAsFixed(2)}",
+                      style: AppStyle.semibold14black),
                 ],
               ),
 
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Your Savings", style: AppStyle.medium14ramdi),
-                  Text("-\$150.00", style: AppStyle.semibold14black),
-                ],
-              ),
-
-              Divider(),
+              const Divider(),
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("Total", style: AppStyle.bold20black),
-                  Text("\$150.00", style: AppStyle.bold20orange),
+                  Text("\$${cartProvider.totalPrice.toStringAsFixed(2)}",
+                      style: AppStyle.bold20orange),
                 ],
               ),
+
               SizedBox(height: height(context) * 0.03),
+
               CustomElevatedButton(
                 onPressed: () {
                   Navigator.pushNamed(context, Approutes.orderconfirmed);
@@ -100,7 +99,6 @@ class CartTab extends StatelessWidget {
                 text: 'Checkout',
                 textStyle: AppStyle.semibold20white,
               ),
-              SizedBox(height: height(context) * 0.1),
             ],
           ),
         ),

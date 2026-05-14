@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:plus90_application/Home/user/homeScrean.dart' as AppRoutes;
 import 'package:plus90_application/utils/AppRoutes.dart';
 import 'package:plus90_application/utils/Dialog_utils.dart';
 import 'package:plus90_application/utils/app-assets.dart';
@@ -15,6 +14,8 @@ class Login extends StatelessWidget {
   TextEditingController email = TextEditingController(text: 'medo@example.com');
   TextEditingController password = TextEditingController(text: 'password123');
   final formKey = GlobalKey<FormState>();
+
+  Login({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -58,8 +59,9 @@ class Login extends StatelessWidget {
                   keyboardType: TextInputType.emailAddress,
                   hintStyle: AppStyle.medium11ramdi,
                   validator: (text) {
-                    if (text == null || text.trim().isEmpty)
+                    if (text == null || text.trim().isEmpty) {
                       return 'please enter email';
+                    }
                     final bool emailValid = RegExp(
                       r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
                     ).hasMatch(text);
@@ -78,10 +80,12 @@ class Login extends StatelessWidget {
                   obscureText: true,
                   hintStyle: AppStyle.medium11ramdi,
                   validator: (text) {
-                    if (text == null || text.trim().isEmpty)
+                    if (text == null || text.trim().isEmpty) {
                       return 'please enter password';
-                    if (text.trim().length < 6)
+                    }
+                    if (text.trim().length < 6) {
                       return 'password must be at least 6 characters';
+                    }
                     return null;
                   },
                 ),

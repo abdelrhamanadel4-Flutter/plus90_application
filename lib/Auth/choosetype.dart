@@ -12,7 +12,7 @@ class Choosetype extends StatefulWidget {
   final String email;
   final String phone;
 
-  Choosetype({
+  const Choosetype({
     super.key,
     required this.name,
     required this.email,
@@ -85,12 +85,9 @@ class _ChoosetypeState extends State<Choosetype> {
               CustomElevatedButton(
                 text: 'Get Started',
                 textStyle: AppStyle.semibold20white,
-
                 onPressed: () async {
                   try {
                     var user = FirebaseAuth.instance.currentUser;
-
-                    print("user: $user");
 
                     if (user == null) {
                       DialogUtils.showMessage(
@@ -110,33 +107,36 @@ class _ChoosetypeState extends State<Choosetype> {
                       return;
                     }
 
-                    // Show loading
                     DialogUtils.showLoading(
                       context: context,
                       loadingText: "Saving data...",
                     );
 
+                    /// ✅ Update user role in Firestore
                     await FirebaseFirestore.instance
                         .collection('users')
                         .doc(user.uid)
-                        .set({
-                          "name": widget.name,
-                          "email": widget.email,
-                          "phone": widget.phone,
-                          "accountType": selectedIndex == 0 ? "user" : "store",
-                        });
+                        .update({
+                      "role": selectedIndex == 0 ? "user" : "store",
+                    });
 
-                    // Hide loading
                     DialogUtils.hideLoading(context: context);
 
-                    print("done firestore");
-
-                    // Navigate
-                    Navigator.pushReplacementNamed(context, Approutes.login);
+                    DialogUtils.showMessage(
+                      context: context,
+                      title: "Success",
+                      message: "Account type saved successfully",
+                      posActionName: "OK",
+                      posAction: () {
+                        Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          Approutes.login,
+                          (route) => false,
+                        );
+                      },
+                    );
                   } catch (e) {
                     DialogUtils.hideLoading(context: context);
-
-                    print("ERROR: $e");
 
                     DialogUtils.showMessage(
                       context: context,
