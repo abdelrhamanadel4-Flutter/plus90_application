@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:plus90_application/Provider/cart_provider.dart';
+import 'package:plus90_application/Provider/fav_provider.dart';
 import 'package:plus90_application/utils/app-assets.dart';
 import 'package:plus90_application/utils/app_color.dart';
 import 'package:plus90_application/utils/app_style.dart';
@@ -15,8 +16,9 @@ import 'package:plus90_application/screens/AddItem.dart';
 
 class DetailsScreen extends StatefulWidget {
   final Map<String, dynamic> dealData;
+  final String id;
 
-  const DetailsScreen({super.key, required this.dealData});
+  const DetailsScreen({super.key, required this.dealData, required this.id});
 
   @override
   State<DetailsScreen> createState() => _DetailsScreenState();
@@ -174,6 +176,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final favProvider = Provider.of<FavoritesProvider>(context);
+
     final data = widget.dealData;
     final imageUrl = (data['images'] as List?)?.isNotEmpty == true
         ? data['images'][0]
@@ -241,17 +245,21 @@ class _DetailsScreenState extends State<DetailsScreen> {
                           if (!isOwner)
                             IconButton(
                               onPressed: () {
+                                favProvider.toggleFavorite(
+                                  widget.id,
+                                ); // ✅ widget.id
                                 setState(() => isfav = !isfav);
-
                                 DialogUtils.showMessage(
                                   context: context,
-                                  message: isfav
+                                  message: favProvider.isFavorite(widget.id)
                                       ? "Added to favorites"
                                       : "Removed from favorites",
                                 );
                               },
                               icon: Icon(
-                                isfav ? Icons.favorite : Icons.favorite_border,
+                                favProvider.isFavorite(widget.id)
+                                    ? Icons.favorite
+                                    : Icons.favorite_border,
                                 color: AppColor.orange,
                                 size: 28,
                               ),

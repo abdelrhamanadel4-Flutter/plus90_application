@@ -65,14 +65,12 @@ class CardItem extends StatelessWidget {
                         ),
                       ),
 
-                    
-                       Text(
-                          'Stock: ${dealData['stock'] ?? '0'}',
-                          style: AppStyle.semibold14orange,
-                          maxLines: 1,
-                        ),
-                      
-         
+                      Text(
+                        'Stock: ${dealData['stock'] ?? '0'}',
+                        style: AppStyle.semibold14orange,
+                        maxLines: 1,
+                      ),
+
                       // GestureDetector(
                       //   onTap: () {
                       //     favProvider.toggleFavorite(id);
@@ -127,7 +125,8 @@ class CardItem extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => DetailsScreen(dealData: dataWithId),
+                          builder: (_) =>
+                              DetailsScreen(dealData: dataWithId, id: id),
                         ),
                       );
                     },
