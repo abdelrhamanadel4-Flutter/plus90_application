@@ -5,12 +5,14 @@ class CartProvider with ChangeNotifier {
 
   Map<String, CartItem> get items => _items;
 
+  // إضافة منتج للسلة
   void addItem({
     required String id,
     required String title,
     required double price,
     required String image,
     required double oldPrice,
+    required String storeId,
   }) {
     if (_items.containsKey(id)) {
       _items.update(
@@ -25,16 +27,25 @@ class CartProvider with ChangeNotifier {
         oldPrice: oldPrice,
         image: image,
         quantity: 1,
+        storeId:storeId
       );
     }
     notifyListeners();
   }
 
+  // ميثود حذف المنتج بالكامل (اللي طلبني أضيفها)
   void removeItem(String id) {
     _items.remove(id);
     notifyListeners();
   }
 
+  // ميثود مسح السلة بالكامل (مفيدة بعد الـ Checkout)
+  void clearCart() {
+    _items.clear();
+    notifyListeners();
+  }
+
+  // زيادة الكمية
   void increaseQty(String id) {
     if (!_items.containsKey(id)) return;
 
@@ -45,6 +56,7 @@ class CartProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // تقليل الكمية
   void decreaseQty(String id) {
     if (!_items.containsKey(id)) return;
 
@@ -62,6 +74,7 @@ class CartProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // حساب السعر الإجمالي
   double get totalPrice {
     double total = 0;
     _items.forEach((key, item) {
@@ -70,6 +83,7 @@ class CartProvider with ChangeNotifier {
     return total;
   }
 
+  // عدد أنواع المنتجات في السلة
   int get itemCount => _items.length;
 }
 
@@ -80,6 +94,7 @@ class CartItem {
   final double oldPrice;
   final String image;
   final int quantity;
+  final String storeId;
 
   CartItem({
     required this.id,
@@ -88,6 +103,7 @@ class CartItem {
     required this.oldPrice,
     required this.image,
     required this.quantity,
+    required this.storeId,
   });
 
   CartItem copyWith({
@@ -97,6 +113,7 @@ class CartItem {
     double? oldPrice,
     String? image,
     int? quantity,
+    String? vendorId,
   }) {
     return CartItem(
       id: id ?? this.id,
@@ -105,6 +122,7 @@ class CartItem {
       oldPrice: oldPrice ?? this.oldPrice,
       image: image ?? this.image,
       quantity: quantity ?? this.quantity,
+      storeId: vendorId ?? this.storeId,
     );
   }
 }

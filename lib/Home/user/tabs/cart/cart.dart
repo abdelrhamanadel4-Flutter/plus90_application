@@ -25,8 +25,9 @@ class CartTab extends StatelessWidget {
             horizontal: width(context) * 0.05,
             vertical: height(context) * 0.02,
           ),
-          child: ListView(
+          child: Column(
             children: [
+              // الجزء العلوي (الهيدر)
               Row(
                 children: [
                   IconButton(
@@ -54,50 +55,56 @@ class CartTab extends StatelessWidget {
 
               SizedBox(height: height(context) * 0.03),
 
-              ListView.builder(
-                itemCount: items.length,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemBuilder: (context, index) {
-                  final item = items[index];
-
-                  return Padding(
-                    padding: EdgeInsets.only(bottom: height(context) * 0.02),
-                    child: CardCart(id: item.id),
-                  );
-                },
+              // قائمة المنتجات - Expanded عشان تاخد المساحة اللي في النص بس وتعمل Scroll
+              Expanded(
+                child: ListView.builder(
+                  itemCount: items.length,
+                  padding: EdgeInsets.zero,
+                  itemBuilder: (context, index) {
+                    final item = items[index];
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: height(context) * 0.02),
+                      child: CardCart(id: item.id),
+                    );
+                  },
+                ),
               ),
 
-              SizedBox(height: height(context) * 0.02),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              // الجزء الثابت تحت
+              Column(
                 children: [
-                  Text("Subtotal", style: AppStyle.medium14ramdi),
-                  Text("\$${cartProvider.totalPrice.toStringAsFixed(2)}",
-                      style: AppStyle.semibold14black),
+                  SizedBox(height: height(context) * 0.02),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("Subtotal", style: AppStyle.medium14ramdi),
+                      Text("\$${cartProvider.totalPrice.toStringAsFixed(2)}",
+                          style: AppStyle.semibold14black),
+                    ],
+                  ),
+                  const Divider(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("Total", style: AppStyle.bold20black),
+                      Text("\$${cartProvider.totalPrice.toStringAsFixed(2)}",
+                          style: AppStyle.bold20orange),
+                    ],
+                  ),
+                  SizedBox(height: height(context) * 0.03),
+                  
+                  // تعديل العرض هنا ليكون بكامل عرض الشاشة
+                  SizedBox(
+                    width: double.infinity, 
+                    child: CustomElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, Approutes.orderconfirmed);
+                      },
+                      text: 'Checkout',
+                      textStyle: AppStyle.semibold20white,
+                    ),
+                  ),
                 ],
-              ),
-
-              const Divider(),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Total", style: AppStyle.bold20black),
-                  Text("\$${cartProvider.totalPrice.toStringAsFixed(2)}",
-                      style: AppStyle.bold20orange),
-                ],
-              ),
-
-              SizedBox(height: height(context) * 0.03),
-
-              CustomElevatedButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, Approutes.orderconfirmed);
-                },
-                text: 'Checkout',
-                textStyle: AppStyle.semibold20white,
               ),
             ],
           ),

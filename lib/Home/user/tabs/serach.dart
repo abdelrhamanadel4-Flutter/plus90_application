@@ -1,14 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:plus90_application/Home/card_item.dart';
-import 'package:plus90_application/utils/AppRoutes.dart';
-import 'package:plus90_application/utils/Dialog_utils.dart';
 import 'package:plus90_application/utils/app-assets.dart';
 import 'package:plus90_application/utils/app_color.dart';
 import 'package:plus90_application/utils/app_style.dart';
 import 'package:plus90_application/utils/custom_text_from.dart';
 
-import 'package:slide_countdown/slide_countdown.dart';
 
 class SearchTab extends StatefulWidget {
   const SearchTab({super.key});

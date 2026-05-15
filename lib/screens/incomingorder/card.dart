@@ -112,13 +112,7 @@ class Cardincomingorder extends StatelessWidget {
                       children: [
                         Text('Quantity: x2', style: AppStyle.semibold14black),
                         SizedBox(height: height(context) * 0.004),
-                        Text('Payment: Cash', style: AppStyle.semibold14black),
-                        SizedBox(height: height(context) * 0.004),
-                        Text(
-                          'Pickup: Store Pickup | ~5:00 PM',
-                          style: AppStyle.semibold14black,
-                          maxLines: 2,
-                        ),
+                        Text('Number For Delivery: 01123654598', style: AppStyle.semibold14black),
                       ],
                     ),
                   ],

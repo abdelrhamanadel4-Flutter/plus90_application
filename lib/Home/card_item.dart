@@ -39,7 +39,7 @@ class CardItem extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: AppColor.grayColor3,
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(16),
         ),
         padding: const EdgeInsets.all(12),
         child: Row(
@@ -54,6 +54,7 @@ class CardItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
                         child: Text(
@@ -64,22 +65,30 @@ class CardItem extends StatelessWidget {
                         ),
                       ),
 
-                      GestureDetector(
-                        onTap: () {
-                          favProvider.toggleFavorite(id);
-
-                          DialogUtils.showMessage(
-                            context: context,
-                            message: favProvider.isFavorite(id)
-                                ? "Added to favorites"
-                                : "Removed from favorites",
-                          );
-                        },
-                        child: Icon(
-                          isFav ? Icons.favorite : Icons.favorite_border,
-                          color: AppColor.orange,
+                    
+                       Text(
+                          'Stock: ${dealData['stock'] ?? '0'}',
+                          style: AppStyle.semibold14orange,
+                          maxLines: 1,
                         ),
-                      ),
+                      
+         
+                      // GestureDetector(
+                      //   onTap: () {
+                      //     favProvider.toggleFavorite(id);
+
+                      //     DialogUtils.showMessage(
+                      //       context: context,
+                      //       message: favProvider.isFavorite(id)
+                      //           ? "Added to favorites"
+                      //           : "Removed from favorites",
+                      //     );
+                      //   },
+                      //   child: Icon(
+                      //     isFav ? Icons.favorite : Icons.favorite_border,
+                      //     color: AppColor.orange,
+                      //   ),
+                      // ),
                     ],
                   ),
 

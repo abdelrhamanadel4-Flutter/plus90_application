@@ -62,8 +62,8 @@ class OrderConfirmed extends StatelessWidget {
                       buildInfoItem(
                         context,
                         icon: Icons.storefront_outlined,
-                        title: 'Store',
-                        subtitle: 'Fresh Bakery Corner',
+                        title: 'Total Paid',
+                        subtitle: '250 EGP',
                       ),
 
                       SizedBox(height: height(context) * 0.03),
@@ -72,8 +72,8 @@ class OrderConfirmed extends StatelessWidget {
                       buildInfoItem(
                         context,
                         icon: Icons.shopping_bag_outlined,
-                        title: 'Method',
-                        subtitle: 'Pickup in 20 minutes',
+                        title: 'Payment Method',
+                        subtitle: 'Cash on Delivery',
                       ),
 
                       SizedBox(height: height(context) * 0.03),
@@ -82,8 +82,8 @@ class OrderConfirmed extends StatelessWidget {
                       buildInfoItem(
                         context,
                         icon: Icons.calendar_month_outlined,
-                        title: 'Date & Time',
-                        subtitle: 'Oct 24, 2023 • 14:30 PM',
+                        title: 'Order Status',
+                        subtitle: 'Waiting for Approval',
                       ),
 
                       SizedBox(height: height(context) * 0.03),

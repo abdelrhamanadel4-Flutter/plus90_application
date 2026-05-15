@@ -37,7 +37,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     try {
       final doc = await FirebaseFirestore.instance
           .collection('users')
-          .doc(_user!.uid)
+          .doc(_user.uid)
           .get();
 
       if (doc.exists) {
@@ -48,17 +48,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             .trim();
         _nameController.text = name.isNotEmpty
             ? name
-            : (_user!.displayName ?? "");
+            : (_user.displayName ?? "");
 
         final photo = (data['photoURL'] ?? "").toString().trim();
-        _currentPhotoURL = photo.isNotEmpty ? photo : _user!.photoURL;
+        _currentPhotoURL = photo.isNotEmpty ? photo : _user.photoURL;
       } else {
-        _nameController.text = _user!.displayName ?? "";
-        _currentPhotoURL = _user!.photoURL;
+        _nameController.text = _user.displayName ?? "";
+        _currentPhotoURL = _user.photoURL;
       }
     } catch (e) {
-      _nameController.text = _user!.displayName ?? "";
-      _currentPhotoURL = _user!.photoURL;
+      _nameController.text = _user.displayName ?? "";
+      _currentPhotoURL = _user.photoURL;
     }
 
     if (mounted) setState(() => _isFetchingData = false);
@@ -167,7 +167,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       // ✅ حدّث Firebase Auth
       // ملاحظة: updatePhotoURL في Auth بتقبل URL فقط، مش Base64
       // عشان كده هنحفظ الصورة في Firestore بس
-      await _user!.updateDisplayName(newName);
+      await _user.updateDisplayName(newName);
 
       // ✅ حدّث Firestore
       final Map<String, dynamic> updateData = {
@@ -186,11 +186,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
       await FirebaseFirestore.instance
           .collection('users')
-          .doc(_user!.uid)
+          .doc(_user.uid)
           .set(updateData, SetOptions(merge: true));
 
       // reload user لتحديث الداتا في Auth
-      await _user!.reload();
+      await _user.reload();
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

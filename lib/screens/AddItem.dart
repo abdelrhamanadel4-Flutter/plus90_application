@@ -35,6 +35,7 @@ class _AddItemScreenState extends State<AddItem> {
   TextEditingController expiryController = TextEditingController();
   TextEditingController intialprice = TextEditingController();
   TextEditingController finalprice = TextEditingController();
+  TextEditingController stockController = TextEditingController();
 
   List<XFile> images = [];
   double? selectedLat;
@@ -135,6 +136,13 @@ class _AddItemScreenState extends State<AddItem> {
       return;
     }
 
+    // ✅ التعديل هنا: التأكد من أن التاريخ المختار لم ينتهِ بعد
+    if (expiryDateTime!.isBefore(DateTime.now())) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("The expiry date is already past. Please select a future date."),),);
+      return;
+    }
+
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) {
       ScaffoldMessenger.of(
@@ -146,6 +154,7 @@ class _AddItemScreenState extends State<AddItem> {
     try {
       await FirebaseFirestore.instance.collection("deals").add({
         "uid": uid,
+        "storeId": uid,
         "title": titleController.text,
         "description": descriptionController.text,
         "category": selectedCategory,
@@ -157,6 +166,7 @@ class _AddItemScreenState extends State<AddItem> {
         "createdAt": FieldValue.serverTimestamp(),
         "initialPrice": intialprice.text,
         "discountedPrice": finalprice.text,
+        "stock": int.tryParse(stockController.text) ?? 0,
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -169,6 +179,7 @@ class _AddItemScreenState extends State<AddItem> {
         descriptionController.clear();
         locationController.clear();
         expiryController.clear();
+        stockController.clear();
         expiryDateTime = null;
       });
 
@@ -184,6 +195,15 @@ class _AddItemScreenState extends State<AddItem> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColor.offwhite,
+      appBar: AppBar(
+        backgroundColor: AppColor.offwhite,
+        elevation: 0,
+        leading: IconButton(
+          padding: const EdgeInsets.only(left: 16),
+          icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF8B1E3F)),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -297,6 +317,28 @@ class _AddItemScreenState extends State<AddItem> {
             ),
             const SizedBox(height: 15),
             const Text(
+              "AVAILABLE STOCK",
+              style: TextStyle(
+                color: Color(0xFF8B1E3F),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: stockController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                hintText: "Quantity (e.g. 10)",
+                filled: true,
+                fillColor: const Color(0xFFE0E5E2),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+            const SizedBox(height: 15),
+            const Text(
               "DESCRIPTION",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
@@ -349,7 +391,8 @@ class _AddItemScreenState extends State<AddItem> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(25),
                       ),
-                      onSelected: (_) => setState(() => selectedCategory = cat),
+                      onSelected: (_) =>
+                          setState(() => selectedCategory = cat),
                     ),
                   );
                 }).toList(),
@@ -394,7 +437,6 @@ class _AddItemScreenState extends State<AddItem> {
                 final result = await Navigator.push(
                   context,
                   MaterialPageRoute(
-                    // ✅ fromAddItem: true عشان يرجع بالـ result
                     builder: (context) =>
                         const ChooseLocationScreen(fromAddItem: true),
                   ),
