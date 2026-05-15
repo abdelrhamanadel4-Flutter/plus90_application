@@ -11,7 +11,9 @@ import 'package:plus90_application/utils/AppRoutes.dart';
 import 'package:plus90_application/utils/app_color.dart';
 
 class ProfileTab extends StatelessWidget {
-  const ProfileTab({super.key});
+  final bool isStore;
+
+  const ProfileTab({super.key, this.isStore = false});
 
   @override
   Widget build(BuildContext context) {
@@ -164,13 +166,13 @@ class ProfileTab extends StatelessWidget {
                           children: [
                             _statCard(
                               Icons.attach_money,
-                              "Total Saved",
+                              isStore ? "Total Sales" : "Total Saved",
                               totalSaved,
                             ),
                             const SizedBox(width: 10),
                             _statCard(
                               Icons.shopping_bag,
-                              "Active Orders",
+                              isStore ? "My Products" : "Active Orders",
                               activeOrders,
                             ),
                           ],
@@ -182,26 +184,28 @@ class ProfileTab extends StatelessWidget {
 
               const SizedBox(height: 30),
 
-              const Text(
-                "My Activity",
-                style: TextStyle(fontWeight: FontWeight.bold),
+              Text(
+                isStore ? "Store Activity" : "My Activity",
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
 
               const SizedBox(height: 15),
 
-              _menuItem(context, Icons.receipt, "My Orders", () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Myorders()),
-                );
-              }),
+              if (!isStore)
+                _menuItem(context, Icons.receipt, "My Orders", () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Myorders()),
+                  );
+                }),
 
-              _menuItem(context, Icons.bookmark, "Fav Deals", () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Favdeals()),
-                );
-              }),
+              if (!isStore)
+                _menuItem(context, Icons.bookmark, "Fav Deals", () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Favdeals()),
+                  );
+                }),
 
               _menuItem(context, Icons.headset_mic, "Support Center", () {
                 Navigator.push(
@@ -314,7 +318,6 @@ class ProfileTab extends StatelessWidget {
     );
   }
 
-  // ✅ Helper: عرض الصورة سواء Base64 أو Network URL
   Widget _buildProfileImage(String? photoURL) {
     if (photoURL == null || photoURL.isEmpty) {
       return const Center(
@@ -323,7 +326,6 @@ class ProfileTab extends StatelessWidget {
     }
 
     if (photoURL.startsWith('data:image')) {
-      // ✅ صورة Base64 من Firestore
       try {
         final base64Str = photoURL.split(',').last;
         return Image.memory(
@@ -337,7 +339,6 @@ class ProfileTab extends StatelessWidget {
       }
     }
 
-    // صورة Network URL عادية
     return Image.network(
       photoURL,
       fit: BoxFit.cover,

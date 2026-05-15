@@ -11,6 +11,7 @@ import 'package:plus90_application/utils/custom-elveted-buttom.dart';
 import 'package:plus90_application/Home/user/tabs/cart/cart.dart';
 import 'package:plus90_application/utils/Dialog_utils.dart';
 import 'package:provider/provider.dart';
+import 'package:plus90_application/screens/AddItem.dart';
 
 class DetailsScreen extends StatefulWidget {
   final Map<String, dynamic> dealData;
@@ -127,8 +128,14 @@ class _DetailsScreenState extends State<DetailsScreen> {
   }
 
   String get discountPercent {
-    final initial = double.tryParse(widget.dealData['initialPrice']?.toString() ?? '0') ?? 0;
-    final discounted = double.tryParse(widget.dealData['discountedPrice']?.toString() ?? '0') ?? 0;
+    final initial =
+        double.tryParse(widget.dealData['initialPrice']?.toString() ?? '0') ??
+        0;
+    final discounted =
+        double.tryParse(
+          widget.dealData['discountedPrice']?.toString() ?? '0',
+        ) ??
+        0;
     if (initial == 0) return '';
     final percent = ((initial - discounted) / initial * 100).round();
     return '-$percent%';
@@ -141,19 +148,36 @@ class _DetailsScreenState extends State<DetailsScreen> {
     if (photoURL.startsWith('data:image')) {
       try {
         final base64Str = photoURL.split(',').last;
-        return Image.memory(base64Decode(base64Str), width: 50, height: 50, fit: BoxFit.cover);
+        return Image.memory(
+          base64Decode(base64Str),
+          width: 50,
+          height: 50,
+          fit: BoxFit.cover,
+        );
       } catch (_) {
         return const Icon(Icons.person, size: 30, color: Colors.white);
       }
     }
-    return Image.network(photoURL, width: 50, height: 50, fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => const Icon(Icons.person, size: 30, color: Colors.white));
+    return Image.network(
+      photoURL,
+      width: 50,
+      height: 50,
+      fit: BoxFit.cover,
+      errorBuilder: (_, __, ___) =>
+          const Icon(Icons.person, size: 30, color: Colors.white),
+    );
+  }
+
+  bool get isOwner {
+    return FirebaseAuth.instance.currentUser?.uid == widget.dealData['uid'];
   }
 
   @override
   Widget build(BuildContext context) {
     final data = widget.dealData;
-    final imageUrl = (data['images'] as List?)?.isNotEmpty == true ? data['images'][0] : null;
+    final imageUrl = (data['images'] as List?)?.isNotEmpty == true
+        ? data['images'][0]
+        : null;
 
     return Scaffold(
       backgroundColor: AppColor.offwhite,
@@ -171,8 +195,16 @@ class _DetailsScreenState extends State<DetailsScreen> {
             /// الصورة العلوية
             Center(
               child: imageUrl != null
-                  ? Image.network(imageUrl, height: 280, fit: BoxFit.fill,
-                      errorBuilder: (_, __, ___) => Image.asset(AppAssets.donut, height: 280, fit: BoxFit.fill))
+                  ? Image.network(
+                      imageUrl,
+                      height: 280,
+                      fit: BoxFit.fill,
+                      errorBuilder: (_, __, ___) => Image.asset(
+                        AppAssets.donut,
+                        height: 280,
+                        fit: BoxFit.fill,
+                      ),
+                    )
                   : Image.asset(AppAssets.donut, height: 280, fit: BoxFit.fill),
             ),
 
@@ -180,7 +212,10 @@ class _DetailsScreenState extends State<DetailsScreen> {
             Expanded(
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 30,
+                ),
                 decoration: BoxDecoration(
                   color: AppColor.grayColor3,
                   borderRadius: const BorderRadius.only(
@@ -196,27 +231,39 @@ class _DetailsScreenState extends State<DetailsScreen> {
                       Row(
                         children: [
                           Expanded(
-                            child: Text(data['title'] ?? '', style: AppStyle.bold18orange),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              setState(() => isfav = !isfav);
-                              DialogUtils.showMessage(
-                                context: context,
-                                message: isfav ? "Added to favorites" : "Removed from favorites",
-                              );
-                            },
-                            icon: Icon(
-                              isfav ? Icons.favorite : Icons.favorite_border,
-                              color: AppColor.orange,
-                              size: 28,
+                            child: Text(
+                              data['title'] ?? '',
+                              style: AppStyle.bold18orange,
                             ),
                           ),
+
+                          /// القلب يظهر لليوزر فقط
+                          if (!isOwner)
+                            IconButton(
+                              onPressed: () {
+                                setState(() => isfav = !isfav);
+
+                                DialogUtils.showMessage(
+                                  context: context,
+                                  message: isfav
+                                      ? "Added to favorites"
+                                      : "Removed from favorites",
+                                );
+                              },
+                              icon: Icon(
+                                isfav ? Icons.favorite : Icons.favorite_border,
+                                color: AppColor.orange,
+                                size: 28,
+                              ),
+                            ),
                         ],
                       ),
 
                       /// الوصف
-                      Text(data['description'] ?? '', style: AppStyle.medium14orange),
+                      Text(
+                        data['description'] ?? '',
+                        style: AppStyle.medium14orange,
+                      ),
                       const SizedBox(height: 20),
 
                       /// العداد الزمني
@@ -224,13 +271,26 @@ class _DetailsScreenState extends State<DetailsScreen> {
                         children: [
                           Text(
                             isActive ? "Ends In " : "Expired",
-                            style: const TextStyle(color: Color(0xffD70000), fontSize: 18, fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                              color: Color(0xffD70000),
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           const SizedBox(width: 10),
-                          const Icon(Icons.timelapse_outlined, color: Color(0xffD70000)),
+                          const Icon(
+                            Icons.timelapse_outlined,
+                            color: Color(0xffD70000),
+                          ),
                           const SizedBox(width: 5),
-                          Text(timerText,
-                              style: const TextStyle(color: Color(0xffD70000), fontSize: 18, fontWeight: FontWeight.bold)),
+                          Text(
+                            timerText,
+                            style: const TextStyle(
+                              color: Color(0xffD70000),
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 15),
@@ -238,18 +298,41 @@ class _DetailsScreenState extends State<DetailsScreen> {
                       /// السعر والخصم
                       Row(
                         children: [
-                          Text("${data['discountedPrice'] ?? '0'} EGP",
-                              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColor.orange)),
+                          Text(
+                            "${data['discountedPrice'] ?? '0'} EGP",
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: AppColor.orange,
+                            ),
+                          ),
                           const SizedBox(width: 10),
-                          Text("${data['initialPrice'] ?? '0'} EGP",
-                              style: const TextStyle(fontSize: 18, color: Colors.grey, decoration: TextDecoration.lineThrough)),
+                          Text(
+                            "${data['initialPrice'] ?? '0'} EGP",
+                            style: const TextStyle(
+                              fontSize: 18,
+                              color: Colors.grey,
+                              decoration: TextDecoration.lineThrough,
+                            ),
+                          ),
                           const SizedBox(width: 10),
                           if (discountPercent.isNotEmpty)
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(color: Colors.green.shade100, borderRadius: BorderRadius.circular(8)),
-                              child: Text(discountPercent,
-                                  style: TextStyle(color: Colors.green.shade800, fontWeight: FontWeight.bold)),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.green.shade100,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                discountPercent,
+                                style: TextStyle(
+                                  color: Colors.green.shade800,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
                         ],
                       ),
@@ -272,21 +355,39 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                       CircleAvatar(
                                         radius: 25,
                                         backgroundColor: Colors.grey,
-                                        child: ClipOval(child: _buildProfileImage(_ownerData?['photoURL'])),
+                                        child: ClipOval(
+                                          child: _buildProfileImage(
+                                            _ownerData?['photoURL'],
+                                          ),
+                                        ),
                                       ),
                                       const SizedBox(width: 12),
                                       Expanded(
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
-                                            Text(_ownerData?['name'] ?? 'Unknown Store',
-                                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                                            Text(_ownerData?['accountType'] ?? '',
-                                                style: const TextStyle(color: Colors.grey)),
+                                            Text(
+                                              _ownerData?['name'] ??
+                                                  'Unknown Store',
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Text(
+                                              _ownerData?['accountType'] ?? '',
+                                              style: const TextStyle(
+                                                color: Colors.grey,
+                                              ),
+                                            ),
                                           ],
                                         ),
                                       ),
-                                      const Icon(Icons.phone, color: AppColor.orange),
+                                      const Icon(
+                                        Icons.phone,
+                                        color: AppColor.orange,
+                                      ),
                                       const SizedBox(width: 5),
                                       Text(_ownerData?['phone'] ?? ''),
                                     ],
@@ -294,11 +395,18 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                   const Divider(height: 25),
                                   Row(
                                     children: [
-                                      const Icon(Icons.location_on, color: AppColor.orange, size: 24),
+                                      const Icon(
+                                        Icons.location_on,
+                                        color: AppColor.orange,
+                                        size: 24,
+                                      ),
                                       const SizedBox(width: 8),
-                                      Expanded(child: Text(data['location'] ?? '', style: const TextStyle(fontSize: 12))),
-                                      Text('View Details', style: AppStyle.medium14orange),
-                                      const Icon(Icons.arrow_forward_ios, size: 14, color: AppColor.orange),
+                                      Expanded(
+                                        child: Text(
+                                          data['location'] ?? '',
+                                          style: const TextStyle(fontSize: 12),
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ],
@@ -312,34 +420,80 @@ class _DetailsScreenState extends State<DetailsScreen> {
                         width: double.infinity,
                         child: isLoadingRole
                             ? const Center(child: CircularProgressIndicator())
-                            : isStore
-                                ? CustomElevatedButton(
-                                    onPressed: () {
-                                      // TODO: Go to Edit Screen
-                                    },
-                                    text: 'Edit Deal',
-                                    textStyle: AppStyle.semibold20white,
-                                    hasSuffix: true,
-                                    iconWidgetSuf: const Icon(Icons.edit_outlined, color: AppColor.offwhite),
-                                  )
-                                : CustomElevatedButton(
-                                    onPressed: () {
-                                      final cart = Provider.of<CartProvider>(context, listen: false);
-                                      cart.addItem(
-                                        id: data['id'] ?? '',
-                                        title: data['title'] ?? '',
-                                        price: double.tryParse(data['discountedPrice'].toString()) ?? 0,
-                                        oldPrice: double.tryParse(data['initialPrice'].toString()) ?? 0,
-                                        image: (data['images'] != null && data['images'].isNotEmpty) ? data['images'][0] : '',
-                                        storeId: data['uid']?.toString() ?? '',
-                                      );
-                                      Navigator.push(context, MaterialPageRoute(builder: (_) => const CartTab()));
-                                    },
-                                    text: 'Add to cart',
-                                    textStyle: AppStyle.semibold20white,
-                                    hasSuffix: true,
-                                    iconWidgetSuf: const Icon(Icons.shopping_cart_outlined, color: AppColor.offwhite),
-                                  ),
+                            : isOwner
+                            ? CustomElevatedButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => AddItem(
+                                        isEdit: true,
+                                        dealId: data['id'],
+
+                                        title: data['title'],
+                                        description: data['description'],
+                                        location: data['location'],
+
+                                        initialPrice: data['initialPrice']
+                                            ?.toString(),
+                                        discountedPrice: data['discountedPrice']
+                                            ?.toString(),
+
+                                        stock: data['stock']?.toString(),
+                                        category: data['category'],
+                                      ),
+                                    ),
+                                  );
+                                },
+                                text: 'Edit Deal',
+                                textStyle: AppStyle.semibold20white,
+                                hasSuffix: true,
+                                iconWidgetSuf: const Icon(
+                                  Icons.edit_outlined,
+                                  color: AppColor.offwhite,
+                                ),
+                              )
+                            : CustomElevatedButton(
+                                onPressed: () {
+                                  final cart = Provider.of<CartProvider>(
+                                    context,
+                                    listen: false,
+                                  );
+                                  cart.addItem(
+                                    id: data['id'] ?? '',
+                                    title: data['title'] ?? '',
+                                    price:
+                                        double.tryParse(
+                                          data['discountedPrice'].toString(),
+                                        ) ??
+                                        0,
+                                    oldPrice:
+                                        double.tryParse(
+                                          data['initialPrice'].toString(),
+                                        ) ??
+                                        0,
+                                    image:
+                                        (data['images'] != null &&
+                                            data['images'].isNotEmpty)
+                                        ? data['images'][0]
+                                        : '',
+                                    storeId: data['uid']?.toString() ?? '',
+                                  );
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const CartTab(),
+                                    ),
+                                  );
+                                },
+                                text: 'Add to cart',
+                                textStyle: AppStyle.semibold20white,
+                                hasSuffix: true,
+                                iconWidgetSuf: const Icon(
+                                  Icons.shopping_cart_outlined,
+                                  color: AppColor.offwhite,
+                                ),
+                              ),
                       ),
                       const SizedBox(height: 20),
                     ],

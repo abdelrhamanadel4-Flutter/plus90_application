@@ -8,7 +8,28 @@ import 'package:plus90_application/utils/app_color.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AddItem extends StatefulWidget {
-  const AddItem({super.key});
+  final bool isEdit;
+  final String? dealId;
+  final String? title;
+  final String? description;
+  final String? location;
+  final String? initialPrice;
+  final String? discountedPrice;
+  final String? stock;
+  final String? category;
+
+  const AddItem({
+    super.key,
+    this.isEdit = false,
+    this.dealId,
+    this.title,
+    this.location,
+    this.initialPrice,
+    this.discountedPrice,
+    this.description,
+    this.stock,
+    this.category,
+  });
 
   @override
   State<AddItem> createState() => _AddItemScreenState();
@@ -41,6 +62,28 @@ class _AddItemScreenState extends State<AddItem> {
   double? selectedLat;
   double? selectedLng;
   DateTime? expiryDateTime;
+
+  void _loadData() {
+    titleController.text = widget.title ?? "";
+    descriptionController.text = widget.description ?? "";
+    locationController.text = widget.location ?? "";
+    intialprice.text = widget.initialPrice ?? "";
+    finalprice.text = widget.discountedPrice ?? "";
+    stockController.text = widget.stock ?? "";
+    selectedCategory = widget.category ?? "Offers";
+
+    // لو عندك expiry string من Firestore (اختياري)
+    // expiryDateTime = DateTime.tryParse(widget.expiry ?? "");
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.isEdit == true) {
+      _loadData();
+    }
+  }
 
   Future<void> pickImages() async {
     final status = await Permission.photos.request();
@@ -101,17 +144,31 @@ class _AddItemScreenState extends State<AddItem> {
   }
 
   Future<void> submitDeal() async {
+    final isEdit = widget.isEdit;
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+
     if (titleController.text.isEmpty) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Please enter a title")));
       return;
     }
-
     if (intialprice.text.isEmpty || finalprice.text.isEmpty) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Please enter prices")));
+      return;
+    }
+
+    double initial = double.tryParse(intialprice.text) ?? 0;
+    double discounted = double.tryParse(finalprice.text) ?? 0;
+
+    if (discounted > initial) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Discounted price can't be higher than original price"),
+        ),
+      );
       return;
     }
 
@@ -136,14 +193,13 @@ class _AddItemScreenState extends State<AddItem> {
       return;
     }
 
-    // ✅ التعديل هنا: التأكد من أن التاريخ المختار لم ينتهِ بعد
     if (expiryDateTime!.isBefore(DateTime.now())) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("The expiry date is already past. Please select a future date."),),);
+        const SnackBar(content: Text("Please select a future expiry date")),
+      );
       return;
     }
 
-    final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) {
       ScaffoldMessenger.of(
         context,
@@ -151,28 +207,44 @@ class _AddItemScreenState extends State<AddItem> {
       return;
     }
 
+    final data = {
+      "uid": uid,
+      "storeId": uid,
+      "title": titleController.text,
+      "description": descriptionController.text,
+      "category": selectedCategory,
+      "location": locationController.text,
+      "lat": selectedLat,
+      "lng": selectedLng,
+      "images": [], // (هتتعدل بعدين لو عندك رفع صور)
+      "expiry": expiryDateTime?.toIso8601String(),
+      "createdAt": FieldValue.serverTimestamp(),
+      "initialPrice": intialprice.text,
+      "discountedPrice": finalprice.text,
+      "stock": int.tryParse(stockController.text) ?? 0,
+    };
+
     try {
-      await FirebaseFirestore.instance.collection("deals").add({
-        "uid": uid,
-        "storeId": uid,
-        "title": titleController.text,
-        "description": descriptionController.text,
-        "category": selectedCategory,
-        "location": locationController.text,
-        "lat": selectedLat,
-        "lng": selectedLng,
-        "images": [],
-        "expiry": expiryDateTime?.toIso8601String(),
-        "createdAt": FieldValue.serverTimestamp(),
-        "initialPrice": intialprice.text,
-        "discountedPrice": finalprice.text,
-        "stock": int.tryParse(stockController.text) ?? 0,
-      });
+      if (isEdit == true && widget.dealId != null) {
+        // ✅ EDIT EXISTING DEAL
+        await FirebaseFirestore.instance
+            .collection("deals")
+            .doc(widget.dealId)
+            .update(data);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Deal published successfully")),
-      );
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Deal updated successfully")),
+        );
+      } else {
+        // ✅ ADD NEW DEAL
+        await FirebaseFirestore.instance.collection("deals").add(data);
 
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Deal published successfully")),
+        );
+      }
+
+      // reset fields
       setState(() {
         images.clear();
         titleController.clear();
@@ -391,8 +463,7 @@ class _AddItemScreenState extends State<AddItem> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(25),
                       ),
-                      onSelected: (_) =>
-                          setState(() => selectedCategory = cat),
+                      onSelected: (_) => setState(() => selectedCategory = cat),
                     ),
                   );
                 }).toList(),
@@ -476,8 +547,8 @@ class _AddItemScreenState extends State<AddItem> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  child: const Text(
-                    "Publish Deal",
+                  child: Text(
+                    widget.isEdit ? "Update Deal" : "Publish Deal",
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 16,

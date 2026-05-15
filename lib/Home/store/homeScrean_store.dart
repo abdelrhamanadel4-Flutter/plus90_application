@@ -24,7 +24,7 @@ class _HomeScreenState extends State<HomescreanStore>
     Homestore(),
     IncomingOrder(),
     MyItems(),
-    ProfileTab(),
+    ProfileTab(isStore: true),
   ];
 
   @override

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:plus90_application/utils/app-assets.dart';
 import 'package:plus90_application/utils/app_color.dart';
 import 'package:plus90_application/utils/app_style.dart';
+import 'package:plus90_application/screens/AddItem.dart';
 
 class CardMyItem extends StatefulWidget {
   final String title;
@@ -11,6 +12,10 @@ class CardMyItem extends StatefulWidget {
   final String discountedPrice;
   final String? imageUrl;
   final DateTime? expiryDate;
+  final String id;
+  final String? description;
+  final String? stock;
+  final String category;
 
   const CardMyItem({
     super.key,
@@ -20,6 +25,10 @@ class CardMyItem extends StatefulWidget {
     required this.discountedPrice,
     this.imageUrl,
     this.expiryDate,
+    required this.id,
+    this.description,
+    this.stock,
+    required this.category,
   });
 
   @override
@@ -59,8 +68,7 @@ class _CardMyItemState extends State<CardMyItem> {
   }
 
   bool get isActive =>
-      widget.expiryDate != null &&
-      widget.expiryDate!.isAfter(DateTime.now());
+      widget.expiryDate != null && widget.expiryDate!.isAfter(DateTime.now());
 
   String get timerText {
     if (widget.expiryDate == null) return '--:--:--';
@@ -125,7 +133,24 @@ class _CardMyItemState extends State<CardMyItem> {
                       ),
                     ),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => AddItem(
+                              isEdit: true,
+                              dealId: widget.id,
+                              title: widget.title,
+                              description: widget.description,
+                              location: widget.location,
+                              initialPrice: widget.initialPrice,
+                              discountedPrice: widget.discountedPrice,
+                              stock: widget.stock,
+                              category: widget.category,
+                            ),
+                          ),
+                        );
+                      },
                       child: Image.asset(
                         AppAssets.edit,
                         color: AppColor.orange,
@@ -175,8 +200,8 @@ class _CardMyItemState extends State<CardMyItem> {
                       ),
                       decoration: BoxDecoration(
                         color: isActive
-                            ? const Color(0xFF7ED36E)   // أخضر = Active
-                            : const Color(0xFFD70000),  // أحمر = Expired
+                            ? const Color(0xFF7ED36E) // أخضر = Active
+                            : const Color(0xFFD70000), // أحمر = Expired
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(

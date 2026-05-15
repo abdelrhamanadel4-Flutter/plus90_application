@@ -69,10 +69,14 @@ class MyItems extends StatelessWidget {
               return Padding(
                 padding: EdgeInsets.symmetric(vertical: width(context) * 0.015),
                 child: CardMyItem(
+                  id: deals[index - 1].id,
                   title: data['title'] ?? '',
                   location: data['location'] ?? '',
                   initialPrice: data['initialPrice'] ?? '0',
                   discountedPrice: data['discountedPrice'] ?? '0',
+                  description: data['description'] ?? '',
+                  stock: data['stock']?.toString() ?? '',
+                  category: data['category'] ?? '',
                   imageUrl: (data['images'] as List?)?.isNotEmpty == true
                       ? data['images'][0]
                       : null,
