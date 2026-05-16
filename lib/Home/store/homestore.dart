@@ -65,7 +65,6 @@ class _HomestoreState extends State<Homestore> {
             return Center(child: Text("Error: ${snapshot.error}"));
           }
 
-          // ✅ لو في بيانات جديدة نحدّث المحفوظة
           if (snapshot.hasData) {
             _lastActiveDocs = [];
             _lastNewCount = 0;
@@ -78,21 +77,21 @@ class _HomestoreState extends State<Homestore> {
               final data = doc.data() as Map<String, dynamic>;
               final status = _getStatus(data['expiry']);
 
-              if (_isNew(data['createdAt'])) _lastNewCount++;
+              // ✅ بيعد New بس لو مش expired
+              if (_isNew(data['createdAt']) && status != 'expired') _lastNewCount++;
 
               if (status == 'active') {
                 _lastActiveCount++;
                 _lastActiveDocs.add(doc);
               } else if (status == 'endsSoon') {
                 _lastEndsSoonCount++;
-                _lastActiveDocs.add(doc); // ✅ بتظهر في Active Now
+                _lastActiveDocs.add(doc);
               } else {
                 _lastExpiredCount++;
               }
             }
           }
 
-          // ✅ loading بس أول مرة
           final isFirstLoad =
               snapshot.connectionState == ConnectionState.waiting &&
               _lastActiveDocs.isEmpty &&
@@ -183,7 +182,6 @@ class _HomestoreState extends State<Homestore> {
                                   style: AppStyle.medium16white,
                                 ),
                                 SizedBox(height: _h * 0.01),
-                                // ✅ Active هنا = active + endsSoon (كل اللي مش expired)
                                 Text(
                                   '${_lastActiveCount + _lastEndsSoonCount} Active',
                                   style: AppStyle.medium16green,
@@ -260,7 +258,6 @@ class _HomestoreState extends State<Homestore> {
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    // ✅ الكارت ده بيتغير بناءً على البوستات
                                     Text(
                                       isFirstLoad ? '...' : '${_lastActiveCount + _lastEndsSoonCount} ',
                                       style: const TextStyle(fontSize: 24, color: Color(0xff000000), fontWeight: FontWeight.bold),

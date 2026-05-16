@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:plus90_application/utils/app_color.dart';
 import 'package:provider/provider.dart';
 import 'package:plus90_application/Provider/cart_provider.dart';
 import 'package:plus90_application/utils/app-assets.dart';
@@ -6,8 +7,9 @@ import 'package:plus90_application/utils/app_style.dart';
 
 class CardCart extends StatelessWidget {
   final String id;
+  final int stock;
 
-  const CardCart({super.key, required this.id});
+  const CardCart({super.key, required this.id, required this.stock});
 
   @override
   Widget build(BuildContext context) {
@@ -16,19 +18,18 @@ class CardCart extends StatelessWidget {
 
     if (item == null) return const SizedBox.shrink();
 
-    // إضافة الـ Dismissible للسحب للحذف
     return Dismissible(
       key: Key(id),
-      direction: DismissDirection.endToStart, // السحب من اليمين للشمال
+      direction: DismissDirection.endToStart, // Swipe from right to left to delete
       onDismissed: (direction) {
-        cartProvider.removeItem(id); // تأكدي إن الميثود دي موجودة في الـ Provider
+        cartProvider.removeItem(id);
       },
       background: Container(
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 20),
         margin: const EdgeInsets.only(bottom: 10),
         decoration: BoxDecoration(
-          color: Colors.red.shade400,
+          color: AppColor.orange,
           borderRadius: BorderRadius.circular(15),
         ),
         child: const Icon(Icons.delete_sweep, color: Colors.white, size: 30),
@@ -49,12 +50,12 @@ class CardCart extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // صورة المنتج
+            // Product Image
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: (item.image != null && item.image!.isNotEmpty)
+              child: (item.image.isNotEmpty)
                   ? Image.network(
-                      item.image!,
+                      item.image,
                       height: MediaQuery.of(context).size.height * 0.1,
                       width: MediaQuery.of(context).size.height * 0.1,
                       fit: BoxFit.cover,
@@ -76,7 +77,7 @@ class CardCart extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // الاسم وزرار الحذف السريع
+                  // Title and Quick Delete Button
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -97,6 +98,7 @@ class CardCart extends StatelessWidget {
 
                   const SizedBox(height: 4),
 
+                  // Old Price (Strikethrough)
                   Text(
                     '\$${item.oldPrice}',
                     style: AppStyle.medium14ramdi.copyWith(
@@ -105,12 +107,13 @@ class CardCart extends StatelessWidget {
                     ),
                   ),
 
+                  // Current Price and Quantity Controllers
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text('\$${item.price}', style: AppStyle.bold20orange),
                       
-                      // التحكم في الكمية
+                      // Quantity Control Panel
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.grey.shade50,
@@ -118,6 +121,7 @@ class CardCart extends StatelessWidget {
                         ),
                         child: Row(
                           children: [
+                            // Decrease Button
                             GestureDetector(
                               onTap: () {
                                 if (item.quantity > 1) {
@@ -128,13 +132,35 @@ class CardCart extends StatelessWidget {
                               },
                               child: Image.asset(AppAssets.Button, height: 28),
                             ),
+                            
+                            // Quantity Text
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 12),
-                              child: Text('${item.quantity}',
-                                  style: AppStyle.bold12orange.copyWith(fontSize: 14)),
+                              child: Text(
+                                '${item.quantity}',
+                                style: AppStyle.bold12orange.copyWith(fontSize: 14),
+                              ),
                             ),
+                            
+                            // Increase Button with Stock Validation & SnackBar Action
                             GestureDetector(
-                              onTap: () => cartProvider.increaseQty(id),
+                              onTap: () {
+                                final String? errorMessage = cartProvider.increaseQty(id, stock);
+                                if (errorMessage != null) {
+                                  ScaffoldMessenger.of(context).clearSnackBars(); // Clears existing snackbars instantly
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        errorMessage,
+                                        style: const TextStyle(fontWeight: FontWeight.bold),
+                                      ),
+                                     
+                                      behavior: SnackBarBehavior.floating,
+                                      duration: const Duration(seconds: 2),
+                                    ),
+                                  );
+                                }
+                              },
                               child: Image.asset(AppAssets.Button2, height: 28),
                             ),
                           ],
@@ -151,7 +177,7 @@ class CardCart extends StatelessWidget {
     );
   }
 
-  // ميثود إظهار رسالة التأكيد عند الحذف
+  // Confirmation dialog before removal
   void _showDeleteDialog(BuildContext context, CartProvider provider, String id) {
     showDialog(
       context: context,
@@ -165,7 +191,7 @@ class CardCart extends StatelessWidget {
           ),
           TextButton(
             onPressed: () {
-              provider.removeItem(id); // تأكدي إن removeItem موجودة في البروفايدر
+              provider.removeItem(id);
               Navigator.of(ctx).pop();
             },
             child: const Text("Remove", style: TextStyle(color: Colors.red)),

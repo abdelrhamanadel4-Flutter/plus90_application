@@ -437,16 +437,13 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                       builder: (_) => AddItem(
                                         isEdit: true,
                                         dealId: data['id'],
-
                                         title: data['title'],
                                         description: data['description'],
                                         location: data['location'],
-
                                         initialPrice: data['initialPrice']
                                             ?.toString(),
                                         discountedPrice: data['discountedPrice']
                                             ?.toString(),
-
                                         stock: data['stock']?.toString(),
                                         category: data['category'],
                                       ),
@@ -467,32 +464,46 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                     context,
                                     listen: false,
                                   );
-                                  cart.addItem(
+                                  
+                                  // استدعاء ميثود إضافة المنتج واستقبال نص الخطأ إن وُجد
+                                  final errorMessage = cart.addItem(
                                     id: data['id'] ?? '',
                                     title: data['title'] ?? '',
-                                    price:
-                                        double.tryParse(
+                                    price: double.tryParse(
                                           data['discountedPrice'].toString(),
-                                        ) ??
-                                        0,
-                                    oldPrice:
-                                        double.tryParse(
+                                        ) ?? 0,
+                                    oldPrice: double.tryParse(
                                           data['initialPrice'].toString(),
-                                        ) ??
-                                        0,
-                                    image:
-                                        (data['images'] != null &&
+                                        ) ?? 0,
+                                    image: (data['images'] != null &&
                                             data['images'].isNotEmpty)
                                         ? data['images'][0]
                                         : '',
                                     storeId: data['uid']?.toString() ?? '',
+                                    stock: int.tryParse(data['stock'].toString()) ?? 0, // جلب الاستوك وتمريره هنا
                                   );
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => const CartTab(),
-                                    ),
-                                  );
+
+                                  // فحص النتيجة إذا كانت هناك رسالة خطأ (المخزن مش كفاية)
+                                  if (errorMessage != null) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          errorMessage,
+                                          style: const TextStyle(fontWeight: FontWeight.bold),
+                                        ),
+                                        backgroundColor: Colors.red,
+                                        behavior: SnackBarBehavior.floating,
+                                      ),
+                                    );
+                                  } else {
+                                    // إذا تمت الإضافة بنجاح، يتم التوجيه لصفحة السلة بشكل طبيعي
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const CartTab(),
+                                      ),
+                                    );
+                                  }
                                 },
                                 text: 'Add to cart',
                                 textStyle: AppStyle.semibold20white,
