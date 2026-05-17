@@ -50,7 +50,10 @@ class CartTab extends StatelessWidget {
                   //   AppAssets.header_cart,
                   //   height: height(context) * 0.05,
                   // ),
-                 Icon(Icons.add_shopping_cart_outlined,color: AppColor.orange,),
+                  Icon(
+                    Icons.add_shopping_cart_outlined,
+                    color: AppColor.orange,
+                  ),
                 ],
               ),
 
@@ -71,12 +74,11 @@ class CartTab extends StatelessWidget {
                         itemBuilder: (context, index) {
                           final item = items[index];
                           return Padding(
-                            padding: EdgeInsets.only(bottom: height(context) * 0.02),
-                            // تم تعديل تمرير الـ stock هنا ليأخذ القيمة الحقيقية للمنتج وليس الـ index
-                            child: CardCart(
-                              id: item.id,
-                              stock: item.stock, 
+                            padding: EdgeInsets.only(
+                              bottom: height(context) * 0.02,
                             ),
+                            // تم تعديل تمرير الـ stock هنا ليأخذ القيمة الحقيقية للمنتج وليس الـ index
+                            child: CardCart(id: item.id, stock: item.stock),
                           );
                         },
                       ),
@@ -108,23 +110,25 @@ class CartTab extends StatelessWidget {
                     ],
                   ),
                   SizedBox(height: height(context) * 0.03),
-                  
+
                   // Full-width Checkout Button
                   SizedBox(
-                    width: double.infinity, 
+                    width: double.infinity,
                     child: CustomElevatedButton(
                       onPressed: () {
                         if (cartProvider.items.isEmpty) return;
                         Navigator.pushNamedAndRemoveUntil(
-                          context, 
-                          Approutes.orderconfirmed, 
-                          (route) => false, // ده بيمسح كل الشاشات القديمة من الـ Stack تماماً
+                          context,
+                          Approutes.orderconfirmed,
+                          (route) =>
+                              false, // ده بيمسح كل الشاشات القديمة من الـ Stack تماماً
                         );
                       },
                       text: 'Checkout',
                       textStyle: AppStyle.semibold20white,
                     ),
                   ),
+                  SizedBox(height: 100),
                 ],
               ),
             ],

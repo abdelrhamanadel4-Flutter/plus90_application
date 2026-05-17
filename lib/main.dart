@@ -1,7 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:plus90_application/Auth/ChooseLocationScreen.dart';
+import 'package:plus90_application/Auth/Choosetype.dart';
 import 'package:plus90_application/Auth/auth.dart';
 import 'package:plus90_application/Auth/login.dart';
 import 'package:plus90_application/Auth/registers.dart';
@@ -25,17 +27,19 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await GoogleSignIn.instance.initialize();
 
   GoogleFonts.config.allowRuntimeFetching = true;
 
-  runApp( MultiProvider(
+  runApp(
+    MultiProvider(
       providers: [
-                ChangeNotifierProvider(create: (_) => FavoritesProvider()),
-
+        ChangeNotifierProvider(create: (_) => FavoritesProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
       ],
       child: MyApp(),
-    ),);
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -49,20 +53,31 @@ class MyApp extends StatelessWidget {
       theme: Apptheme.darktheme,
       themeMode: ThemeMode.dark,
       routes: {
-        Approutes.splach: (context) => (SplachScreen()),
-        Approutes.onborading: (context) => (Onboradingpages()),
-        Approutes.auth: (context) => (Auth()),
-        Approutes.login: (context) => (Login()),
-        Approutes.registers: (context) => (Registers()),
-        Approutes.HomeScreen: (context) => (HomeScreen()),
-        Approutes.HomescreanStore: (context) => (HomescreanStore()),
-    
-        Approutes.Myorders: (context) => (Myorders()),
-        Approutes.Categories: (context) => (Categories()),
-        Approutes.orderconfirmed: (context) => (OrderConfirmed()),
-        Approutes.SellScreen: (context) => (SellScreen()),
-        Approutes.AddItem: (context) => (AddItem()),
-        Approutes.ChooseLocationScreen: (context) => (ChooseLocationScreen()),
+        Approutes.splach: (context) => SplachScreen(),
+        Approutes.onborading: (context) => Onboradingpages(),
+        Approutes.auth: (context) => Auth(),
+        Approutes.login: (context) => Login(),
+        Approutes.registers: (context) => Registers(),
+        Approutes.HomeScreen: (context) => HomeScreen(),
+        Approutes.HomescreanStore: (context) => HomescreanStore(),
+        Approutes.Myorders: (context) => Myorders(),
+        Approutes.Categories: (context) => Categories(),
+        Approutes.orderconfirmed: (context) => OrderConfirmed(),
+        Approutes.SellScreen: (context) => SellScreen(),
+        Approutes.AddItem: (context) => AddItem(),
+        Approutes.ChooseLocationScreen: (context) => ChooseLocationScreen(),
+
+        // ✅ Choosetype route مع arguments
+        Approutes.Choosetype: (context) {
+          final args =
+              ModalRoute.of(context)?.settings.arguments
+                  as Map<String, dynamic>?;
+          return Choosetype(
+            name: args?['name'] ?? '',
+            email: args?['email'] ?? '',
+            phone: args?['phone'] ?? '',
+          );
+        },
       },
     );
   }

@@ -43,8 +43,34 @@ class CardItem extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         child: Row(
           children: [
-            Expanded(child: Image.asset(AppAssets.donut, fit: BoxFit.fill)),
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: () {
+                  final images = dealData['images'];
+                  final imageUrl = (images is List && images.isNotEmpty)
+                      ? images.first.toString()
+                      : null;
 
+                  return imageUrl != null
+                      ? Image.network(
+                          imageUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) =>
+                              Image.asset(AppAssets.donut, fit: BoxFit.cover),
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return const Center(
+                              child: CircularProgressIndicator(
+                                color: Color(0xFF8B1E3F),
+                              ),
+                            );
+                          },
+                        )
+                      : Image.asset(AppAssets.donut, fit: BoxFit.cover);
+                }(),
+              ),
+            ),
             const SizedBox(width: 12),
 
             Expanded(

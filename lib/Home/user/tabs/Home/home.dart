@@ -190,21 +190,20 @@ class _HomeUIState extends State<HomeUI> {
                   const SizedBox(height: 15),
 
                   /// search
-                  CustomTextFormField(
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: width(context) * 0.04,
-                      vertical: height(context) * 0.02,
-                    ),
-                    hint: 'Search deals, restaurants, activities...',
-                    hintStyle: AppStyle.medium14ramdi,
-                    prefixIcon: Image.asset(
-                      AppAssets.icon_search,
-                      height: height(context) * 0.007,
-                    ),
-                    borderColor: AppColor.grayColor,
-                    fillColor: AppColor.whiteColor,
-                  ),
-
+                  // CustomTextFormField(
+                  //   contentPadding: EdgeInsets.symmetric(
+                  //     horizontal: width(context) * 0.04,
+                  //     vertical: height(context) * 0.02,
+                  //   ),
+                  //   hint: 'Search deals, restaurants, activities...',
+                  //   hintStyle: AppStyle.medium14ramdi,
+                  //   prefixIcon: Image.asset(
+                  //     AppAssets.icon_search,
+                  //     height: height(context) * 0.007,
+                  //   ),
+                  //   borderColor: AppColor.grayColor,
+                  //   fillColor: AppColor.whiteColor,
+                  // ),
                   const SizedBox(height: 15),
 
                   /// banner
@@ -505,7 +504,7 @@ class _HomeUIState extends State<HomeUI> {
                       }
 
                       return ListView.builder(
-                        itemCount: deals.length,
+                        itemCount: 5,
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         padding: EdgeInsets.symmetric(

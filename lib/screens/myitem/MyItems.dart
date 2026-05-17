@@ -38,9 +38,8 @@ class MyItems extends StatelessWidget {
               horizontal: width(context) * 0.04,
               vertical: height(context) * 0.01,
             ),
-            itemCount: deals.length + 1, // ✅ +1 عشان الـ header
+            itemCount: deals.length + 1,
             itemBuilder: (context, index) {
-              // ✅ أول عنصر هو الـ header
               if (index == 0) {
                 return Column(
                   children: [
@@ -58,12 +57,19 @@ class MyItems extends StatelessWidget {
                 );
               }
 
-              // ✅ باقي العناصر هي الـ deals
               final data = deals[index - 1].data() as Map<String, dynamic>;
 
               DateTime? expiryDate;
               if (data['expiry'] != null) {
                 expiryDate = DateTime.tryParse(data['expiry']);
+              }
+
+              // ✅ جيب الصور كـ List صح
+              List<String> imageUrls = [];
+              if (data['images'] is List) {
+                imageUrls = (data['images'] as List)
+                    .map((e) => e.toString())
+                    .toList();
               }
 
               return Padding(
@@ -77,9 +83,11 @@ class MyItems extends StatelessWidget {
                   description: data['description'] ?? '',
                   stock: data['stock']?.toString() ?? '',
                   category: data['category'] ?? '',
-                  imageUrl: (data['images'] as List?)?.isNotEmpty == true
-                      ? data['images'][0]
-                      : null,
+                  // ✅ بعت أول صورة للعرض في الكارد
+                  imageUrl: imageUrls.isNotEmpty ? imageUrls.first : null,
+                  // ✅ بعت كل الصور للـ edit
+                  imageUrls: imageUrls, // ✅ هنا كانت ناقصة
+
                   expiryDate: expiryDate,
                 ),
               );

@@ -49,7 +49,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
     super.dispose();
   }
 
-  /// جلب دور المستخدم الحالي (User or Store)
   Future<void> _fetchUserRole() async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
@@ -70,7 +69,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
     }
   }
 
-  /// جلب بيانات صاحب العرض (البروفايل الخاص بالمتجر)
   Future<void> _fetchOwnerData() async {
     final ownerUid = widget.dealData['uid'];
     if (ownerUid == null) {
@@ -93,7 +91,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
     }
   }
 
-  /// عداد الوقت
   void _startTimer() {
     final expiry = widget.dealData['expiry'];
     if (expiry == null) return;
@@ -179,7 +176,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
     final favProvider = Provider.of<FavoritesProvider>(context);
 
     final data = widget.dealData;
-    final imageUrl = (data['images'] as List?)?.isNotEmpty == true
+    final imageUrl =
+        (data['images'] is List && (data['images'] as List).isNotEmpty)
         ? data['images'][0]
         : null;
 
@@ -212,7 +210,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
                   : Image.asset(AppAssets.donut, height: 280, fit: BoxFit.fill),
             ),
 
-            /// محتوى التفاصيل
             Expanded(
               child: Container(
                 width: double.infinity,
@@ -231,7 +228,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      /// العنوان والمفضلة
                       Row(
                         children: [
                           Expanded(
@@ -240,14 +236,10 @@ class _DetailsScreenState extends State<DetailsScreen> {
                               style: AppStyle.bold18orange,
                             ),
                           ),
-
-                          /// القلب يظهر لليوزر فقط
                           if (!isOwner)
                             IconButton(
                               onPressed: () {
-                                favProvider.toggleFavorite(
-                                  widget.id,
-                                ); // ✅ widget.id
+                                favProvider.toggleFavorite(widget.id);
                                 setState(() => isfav = !isfav);
                                 DialogUtils.showMessage(
                                   context: context,
@@ -267,14 +259,12 @@ class _DetailsScreenState extends State<DetailsScreen> {
                         ],
                       ),
 
-                      /// الوصف
                       Text(
                         data['description'] ?? '',
                         style: AppStyle.medium14orange,
                       ),
                       const SizedBox(height: 20),
 
-                      /// العداد الزمني
                       Row(
                         children: [
                           Text(
@@ -303,7 +293,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
                       ),
                       const SizedBox(height: 15),
 
-                      /// السعر والخصم
                       Row(
                         children: [
                           Text(
@@ -346,7 +335,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
                       ),
                       const SizedBox(height: 20),
 
-                      /// كارت المتجر
                       Container(
                         padding: const EdgeInsets.all(15),
                         decoration: BoxDecoration(
@@ -423,7 +411,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
                       const SizedBox(height: 30),
 
-                      /// زرار الأكشن (Add to Cart / Edit)
                       SizedBox(
                         width: double.infinity,
                         child: isLoadingRole
@@ -446,6 +433,12 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                             ?.toString(),
                                         stock: data['stock']?.toString(),
                                         category: data['category'],
+                                        imageUrls:
+                                            (data['images'] is List) // ✅
+                                            ? (data['images'] as List)
+                                                  .map((e) => e.toString())
+                                                  .toList()
+                                            : [],
                                       ),
                                     ),
                                   );
@@ -464,39 +457,47 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                     context,
                                     listen: false,
                                   );
-                                  
-                                  // استدعاء ميثود إضافة المنتج واستقبال نص الخطأ إن وُجد
+
                                   final errorMessage = cart.addItem(
                                     id: data['id'] ?? '',
                                     title: data['title'] ?? '',
-                                    price: double.tryParse(
+                                    price:
+                                        double.tryParse(
                                           data['discountedPrice'].toString(),
-                                        ) ?? 0,
-                                    oldPrice: double.tryParse(
+                                        ) ??
+                                        0,
+                                    oldPrice:
+                                        double.tryParse(
                                           data['initialPrice'].toString(),
-                                        ) ?? 0,
-                                    image: (data['images'] != null &&
-                                            data['images'].isNotEmpty)
+                                        ) ??
+                                        0,
+                                    image:
+                                        (data['images'] is List &&
+                                            (data['images'] as List).isNotEmpty)
                                         ? data['images'][0]
                                         : '',
                                     storeId: data['uid']?.toString() ?? '',
-                                    stock: int.tryParse(data['stock'].toString()) ?? 0, // جلب الاستوك وتمريره هنا
+                                    stock:
+                                        int.tryParse(
+                                          data['stock'].toString(),
+                                        ) ??
+                                        0,
                                   );
 
-                                  // فحص النتيجة إذا كانت هناك رسالة خطأ (المخزن مش كفاية)
                                   if (errorMessage != null) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text(
                                           errorMessage,
-                                          style: const TextStyle(fontWeight: FontWeight.bold),
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
                                         backgroundColor: Colors.red,
                                         behavior: SnackBarBehavior.floating,
                                       ),
                                     );
                                   } else {
-                                    // إذا تمت الإضافة بنجاح، يتم التوجيه لصفحة السلة بشكل طبيعي
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(

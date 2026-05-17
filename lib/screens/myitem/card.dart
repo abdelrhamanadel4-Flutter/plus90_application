@@ -11,6 +11,7 @@ class CardMyItem extends StatefulWidget {
   final String initialPrice;
   final String discountedPrice;
   final String? imageUrl;
+  final List<String> imageUrls;
   final DateTime? expiryDate;
   final String id;
   final String? description;
@@ -24,6 +25,7 @@ class CardMyItem extends StatefulWidget {
     required this.initialPrice,
     required this.discountedPrice,
     this.imageUrl,
+    this.imageUrls = const [],
     this.expiryDate,
     required this.id,
     this.description,
@@ -46,7 +48,6 @@ class _CardMyItemState extends State<CardMyItem> {
   void initState() {
     super.initState();
     _updateRemaining();
-    // يحدث الـ timer كل ثانية
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       _updateRemaining();
     });
@@ -94,33 +95,43 @@ class _CardMyItemState extends State<CardMyItem> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          /// image
+          // ✅ الصورة
           Container(
             height: height(context) * 0.12,
             width: width(context) * 0.26,
             decoration: BoxDecoration(
               color: AppColor.whiteColor,
               borderRadius: BorderRadius.circular(18),
-              image: widget.imageUrl != null
-                  ? DecorationImage(
-                      image: NetworkImage(widget.imageUrl!),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(18),
+              child: widget.imageUrl != null
+                  ? Image.network(
+                      widget.imageUrl!,
                       fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        print("Image error: $error");
+                        return Image.asset(AppAssets.donut, fit: BoxFit.cover);
+                      },
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            color: Color(0xFF8B1E3F),
+                          ),
+                        );
+                      },
                     )
-                  : DecorationImage(
-                      image: AssetImage(AppAssets.donut),
-                      fit: BoxFit.cover,
-                    ),
+                  : Image.asset(AppAssets.donut, fit: BoxFit.cover),
             ),
           ),
 
           SizedBox(width: width(context) * 0.035),
 
-          /// details
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                /// title + edit
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -147,6 +158,7 @@ class _CardMyItemState extends State<CardMyItem> {
                               discountedPrice: widget.discountedPrice,
                               stock: widget.stock,
                               category: widget.category,
+                              imageUrls: widget.imageUrls,
                             ),
                           ),
                         );
@@ -161,7 +173,6 @@ class _CardMyItemState extends State<CardMyItem> {
 
                 SizedBox(height: height(context) * 0.005),
 
-                /// location
                 Row(
                   children: [
                     Icon(
@@ -182,7 +193,6 @@ class _CardMyItemState extends State<CardMyItem> {
 
                 SizedBox(height: height(context) * 0.008),
 
-                /// price + status
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -191,8 +201,6 @@ class _CardMyItemState extends State<CardMyItem> {
                       style: AppStyle.bold20orange,
                     ),
                     const Spacer(),
-
-                    /// ✅ Status ديناميكي
                     Container(
                       padding: EdgeInsets.symmetric(
                         horizontal: width(context) * 0.05,
@@ -200,8 +208,8 @@ class _CardMyItemState extends State<CardMyItem> {
                       ),
                       decoration: BoxDecoration(
                         color: isActive
-                            ? const Color(0xFF7ED36E) // أخضر = Active
-                            : const Color(0xFFD70000), // أحمر = Expired
+                            ? const Color(0xFF7ED36E)
+                            : const Color(0xFFD70000),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
@@ -216,7 +224,6 @@ class _CardMyItemState extends State<CardMyItem> {
 
                 SizedBox(height: height(context) * 0.003),
 
-                /// old price
                 Text(
                   '\$${widget.initialPrice}',
                   style: AppStyle.medium14ramdi.copyWith(
@@ -226,7 +233,6 @@ class _CardMyItemState extends State<CardMyItem> {
 
                 SizedBox(height: height(context) * 0.01),
 
-                /// timer
                 Row(
                   children: [
                     Text(
