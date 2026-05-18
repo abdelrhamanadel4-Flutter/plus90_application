@@ -50,6 +50,8 @@ class ProfileTab extends StatelessWidget {
           String? photoURL = user.photoURL;
           String totalSaved = "\$0.00";
 
+          double totalSalesValue = 0;
+
           if (snapshot.hasData && snapshot.data!.exists) {
             final data = snapshot.data!.data() as Map<String, dynamic>;
 
@@ -65,6 +67,8 @@ class ProfileTab extends StatelessWidget {
             if (saved != null) {
               totalSaved = "\$${(saved as num).toDouble().toStringAsFixed(2)}";
             }
+
+            totalSalesValue = (data['totalSales'] as num?)?.toDouble() ?? 0;
           }
 
           return SingleChildScrollView(
@@ -188,37 +192,15 @@ class ProfileTab extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Row(
                       children: [
-                        // ── Total Saved / Total Sales ──
                         Expanded(
                           child: isStore
-                              ? StreamBuilder<QuerySnapshot>(
-                                  stream: FirebaseFirestore.instance
-                                      .collection('orders')
-                                      .where('storeId', isEqualTo: user.uid)
-                                      .where('status', isEqualTo: 'accepted')
-                                      .snapshots(),
-                                  builder: (context, salesSnapshot) {
-                                    double totalSales = 0;
-                                    if (salesSnapshot.hasData) {
-                                      for (var doc
-                                          in salesSnapshot.data!.docs) {
-                                        final data =
-                                            doc.data() as Map<String, dynamic>;
-                                        totalSales +=
-                                            (data['totalPrice'] as num?)
-                                                ?.toDouble() ??
-                                            0;
-                                      }
-                                    }
-                                    return _statCard(
-                                      icon: Icons.attach_money_rounded,
-                                      iconBg: const Color(0xFFFBEAF0),
-                                      iconColor: AppColor.orange,
-                                      label: "Total Sales",
-                                      value:
-                                          "\$${totalSales.toStringAsFixed(2)}",
-                                    );
-                                  },
+                              ? _statCard(
+                                  icon: Icons.attach_money_rounded,
+                                  iconBg: const Color(0xFFFBEAF0),
+                                  iconColor: AppColor.orange,
+                                  label: "Total Sales",
+                                  value:
+                                      "\$${totalSalesValue.toStringAsFixed(2)}",
                                 )
                               : _statCard(
                                   icon: Icons.attach_money_rounded,
@@ -231,7 +213,6 @@ class ProfileTab extends StatelessWidget {
 
                         const SizedBox(width: 10),
 
-                        // ── My Products / Active Orders ──
                         Expanded(
                           child: isStore
                               ? StreamBuilder<QuerySnapshot>(
@@ -267,7 +248,10 @@ class ProfileTab extends StatelessWidget {
                               : StreamBuilder<QuerySnapshot>(
                                   stream: FirebaseFirestore.instance
                                       .collection('orders')
-                                      .where('userId', isEqualTo: user.uid)
+                                      .where(
+                                        'buyerId',
+                                        isEqualTo: user.uid,
+                                      ) // ✅ FIX
                                       .where('status', isEqualTo: 'pending')
                                       .snapshots(),
                                   builder: (context, ordersSnapshot) {

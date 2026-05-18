@@ -64,7 +64,11 @@ class _HomestoreState extends State<Homestore> {
             .snapshots(),
         builder: (context, userSnapshot) {
           final totalSales =
-              (userSnapshot.data?.get('totalSales') as num?)?.toDouble() ?? 0;
+              ((userSnapshot.data?.data()
+                          as Map<String, dynamic>?)?['totalSales']
+                      as num?)
+                  ?.toDouble() ??
+              0;
 
           return StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
@@ -180,7 +184,6 @@ class _HomestoreState extends State<Homestore> {
                                       style: AppStyle.medium20white,
                                     ),
                                     SizedBox(height: _h * 0.006),
-                                    // ✅ عرض مجموع الفلوس
                                     Text(
                                       isFirstLoad
                                           ? '...'
