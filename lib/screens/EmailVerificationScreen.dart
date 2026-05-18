@@ -375,12 +375,17 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                       ),
                     ),
                     const SizedBox(width: 10),
-                    Text(
-                      'Checking automatically every 3 seconds...',
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        color: AppColor.orange.withOpacity(0.8),
-                        fontWeight: FontWeight.w400,
+                    Expanded(
+                      child: Text(
+                        'Checking automatically every 3 seconds...',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+
+                        style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          color: AppColor.orange.withOpacity(0.8),
+                          fontWeight: FontWeight.w400,
+                        ),
                       ),
                     ),
                   ],

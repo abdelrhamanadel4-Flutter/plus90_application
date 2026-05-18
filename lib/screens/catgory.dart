@@ -24,7 +24,7 @@ class _CategoriesState extends State<Categories> {
   String selectedCategory = "All";
 
   final List<String> catgory = [
-    "All", // ← أضفنا "All" كأول عنصر عشان selectedindex=0 يطابقه
+    "All",
     "Offers",
     "Restaurants & Cafes",
     "Fashion",
@@ -35,11 +35,16 @@ class _CategoriesState extends State<Categories> {
     "Automotive",
   ];
 
+  DateTime? _parseDate(dynamic value) {
+    if (value == null) return null;
+    if (value is Timestamp) return value.toDate();
+    if (value is String) return DateTime.tryParse(value);
+    return null;
+  }
+
   @override
   void initState() {
     super.initState();
-
-    // استقبل الـ category argument اللي جت من الـ Home
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final args = ModalRoute.of(context)?.settings.arguments as String?;
       if (args != null && args.isNotEmpty) {
@@ -209,7 +214,6 @@ class _CategoriesState extends State<Categories> {
                     .toLowerCase();
                 final category = (data['category'] ?? '').toString();
 
-                // لو selectedCategory == "All" → مش بنفلتر بالكاتيجوري
                 final matchesCategory = selectedCategory == "All"
                     ? true
                     : category == selectedCategory;
@@ -219,16 +223,16 @@ class _CategoriesState extends State<Categories> {
                     : title.contains(searchText) ||
                           location.contains(searchText);
 
-                final expiryStr = data['expiry']?.toString();
-                bool isActive = true;
-                if (expiryStr != null && expiryStr.isNotEmpty) {
-                  final expiryDate = DateTime.tryParse(expiryStr);
-                  if (expiryDate != null) {
-                    isActive = expiryDate.isAfter(DateTime.now());
-                  }
-                }
+                // ✅ نفس الـ logic بتاعت Home - بتتعامل مع Timestamp و String
+                final expiryDate = _parseDate(data['expiry']);
+                final isActive =
+                    expiryDate == null || expiryDate.isAfter(DateTime.now());
 
-                return matchesCategory && matchesSearch && isActive;
+                // ✅ نفس الـ logic بتاعت Home - stock <= 0 يتشال
+                final stock = (data['stock'] as num?)?.toInt() ?? 0;
+                final hasStock = stock > 0;
+
+                return matchesCategory && matchesSearch && isActive && hasStock;
               }).toList();
 
               if (filteredDeals.isEmpty) {

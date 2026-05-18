@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:plus90_application/Home/card_item.dart';
 import 'package:plus90_application/Home/user/tabs/Home/seeall_expringsoon.dart';
 import 'package:plus90_application/Home/user/tabs/Home/seeall_storesnear.dart';
-import 'package:plus90_application/screens/notification_screen.dart';
+import 'package:plus90_application/screens/notfication/NotificationBell.dart';
 import 'package:plus90_application/utils/AppRoutes.dart';
 import 'package:plus90_application/utils/app_color.dart';
 
@@ -114,13 +114,27 @@ class _HomeUIState extends State<HomeUI> {
     return const Color(0xFF861E43);
   }
 
-  // ─── helper لفتح Categories مع category محددة ───────────────────────────
   void _goToCategory(String categoryName) {
     Navigator.pushReplacementNamed(
       context,
       Approutes.Categories,
       arguments: categoryName,
     );
+  }
+
+  bool _isValidDeal(Map<String, dynamic> data) {
+    final expiry = data['expiry'];
+    if (expiry == null) return false;
+    final expiryDate = DateTime.tryParse(expiry);
+    if (expiryDate == null) return false;
+    if (expiryDate.isBefore(DateTime.now())) return false;
+
+    // ✅ بيتعامل مع num وString وnull
+    final stockRaw = data['stock'];
+    final stock = num.tryParse(stockRaw?.toString() ?? '0') ?? 0;
+    if (stock <= 0) return false;
+
+    return true;
   }
 
   @override
@@ -158,49 +172,11 @@ class _HomeUIState extends State<HomeUI> {
                           ),
                         ),
                       ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const NotificationsScreen(),
-                            ),
-                          );
-                        },
-                        child: Container(
-                          width: 44,
-                          height: 44,
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          child: const Icon(
-                            Icons.notifications_none,
-                            color: Color(0xFF861E43),
-                          ),
-                        ),
-                      ),
+                      const NotificationBell(),
                     ],
                   ),
 
                   const SizedBox(height: 15),
-
-                  /// search
-                  // CustomTextFormField(
-                  //   contentPadding: EdgeInsets.symmetric(
-                  //     horizontal: width(context) * 0.04,
-                  //     vertical: height(context) * 0.02,
-                  //   ),
-                  //   hint: 'Search deals, restaurants, activities...',
-                  //   hintStyle: AppStyle.medium14ramdi,
-                  //   prefixIcon: Image.asset(
-                  //     AppAssets.icon_search,
-                  //     height: height(context) * 0.007,
-                  //   ),
-                  //   borderColor: AppColor.grayColor,
-                  //   fillColor: AppColor.whiteColor,
-                  // ),
                   const SizedBox(height: 15),
 
                   /// banner
@@ -234,6 +210,8 @@ class _HomeUIState extends State<HomeUI> {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return SizedBox(
                           height: 170,
+                          width: 10000,
+
                           child: ListView.separated(
                             scrollDirection: Axis.horizontal,
                             itemCount: 4,
@@ -254,16 +232,9 @@ class _HomeUIState extends State<HomeUI> {
                         return const SizedBox.shrink();
                       }
 
-                      final now = DateTime.now();
-
                       var deals = snapshot.data!.docs.where((doc) {
                         final data = doc.data() as Map<String, dynamic>;
-                        final expiry = data['expiry'];
-                        if (expiry == null) return false;
-                        final expiryDate = DateTime.tryParse(expiry);
-                        if (expiryDate == null) return false;
-                        if (expiryDate.isBefore(now)) return false;
-                        return true;
+                        return _isValidDeal(data);
                       }).toList();
 
                       deals.sort((a, b) {
@@ -337,7 +308,6 @@ class _HomeUIState extends State<HomeUI> {
                   sectionTitle(
                     "Categories",
                     onTap: () {
-                      // "See All" بتفتح Categories بدون فلتر (All)
                       Navigator.pushReplacementNamed(
                         context,
                         Approutes.Categories,
@@ -347,15 +317,7 @@ class _HomeUIState extends State<HomeUI> {
                   ),
 
                   const SizedBox(height: 10),
-                  // "Offers",
-                  // "Restaurants & Cafes",
-                  // "Fashion",
-                  // "Beauty & Care",
-                  // "Home Services",
-                  // "Electronics",
-                  // "Events",
-                  // "Automotive",
-                  // ─── Categories row مع onTap لكل category ───────────────
+
                   SizedBox(
                     height: 100,
                     child: ListView(
@@ -379,7 +341,7 @@ class _HomeUIState extends State<HomeUI> {
                         category(
                           icon: Icons.checkroom,
                           label: "Fashion",
-                          categoryKey: "Fashion", //
+                          categoryKey: "Fashion",
                           onTap: _goToCategory,
                         ),
                         const SizedBox(width: 25),
@@ -393,7 +355,7 @@ class _HomeUIState extends State<HomeUI> {
                         category(
                           icon: Icons.home_repair_service,
                           label: "Home Services",
-                          categoryKey: "Home Services", //
+                          categoryKey: "Home Services",
                           onTap: _goToCategory,
                         ),
                         const SizedBox(width: 25),
@@ -407,7 +369,7 @@ class _HomeUIState extends State<HomeUI> {
                         category(
                           icon: Icons.event,
                           label: "Events",
-                          categoryKey: "Events", //
+                          categoryKey: "Events",
                           onTap: _goToCategory,
                         ),
                         const SizedBox(width: 25),
@@ -455,16 +417,9 @@ class _HomeUIState extends State<HomeUI> {
                         return const Center(child: Text("No Deals Found"));
                       }
 
-                      final now = DateTime.now();
-
                       var deals = snapshot.data!.docs.where((doc) {
                         final data = doc.data() as Map<String, dynamic>;
-                        final expiry = data['expiry'];
-                        if (expiry == null) return false;
-                        final expiryDate = DateTime.tryParse(expiry);
-                        if (expiryDate == null) return false;
-                        if (expiryDate.isBefore(now)) return false;
-                        return true;
+                        return _isValidDeal(data);
                       }).toList();
 
                       if (userLat != null && userLng != null) {
@@ -501,7 +456,7 @@ class _HomeUIState extends State<HomeUI> {
                       }
 
                       return ListView.builder(
-                        itemCount: 5,
+                        itemCount: deals.length < 5 ? deals.length : 5,
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         padding: EdgeInsets.symmetric(

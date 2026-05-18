@@ -20,7 +20,7 @@ class Auth extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              SizedBox(height: height(context) * 0.09),
+              SizedBox(height: height(context) * 0.17),
 
               Image.asset(AppAssets.Auth),
               SizedBox(height: height(context) * 0.07),
@@ -43,11 +43,6 @@ class Auth extends StatelessWidget {
                 textStyle: AppStyle.semibold20orange,
               ),
               SizedBox(height: height(context) * 0.14),
-              Text(
-                'Continue as a guest',
-                textAlign: TextAlign.center,
-                style: AppStyle.medium16black,
-              ),
             ],
           ),
         ),

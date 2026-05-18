@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SupportScreen extends StatefulWidget {
   const SupportScreen({super.key});
@@ -10,11 +12,15 @@ class SupportScreen extends StatefulWidget {
 
 class _SupportScreenState extends State<SupportScreen> {
   final TextEditingController _reportController = TextEditingController();
+  bool _isLoading = false;
 
-  /// 🔥 Professional popup message
-  void _showSuccessMessage(String message) {
-    final overlay = Overlay.of(context);
+  @override
+  void dispose() {
+    _reportController.dispose();
+    super.dispose();
+  }
 
+  void _showMessage(String message, {bool isError = false}) {
     final overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
         top: MediaQuery.of(context).size.height * 0.4,
@@ -31,7 +37,10 @@ class _SupportScreenState extends State<SupportScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.check_circle, color: Colors.green),
+                Icon(
+                  isError ? Icons.error_outline : Icons.check_circle,
+                  color: isError ? Colors.redAccent : Colors.green,
+                ),
                 const SizedBox(width: 10),
                 Flexible(
                   child: Text(
@@ -47,24 +56,40 @@ class _SupportScreenState extends State<SupportScreen> {
       ),
     );
 
-    overlay.insert(overlayEntry);
+    Overlay.of(context).insert(overlayEntry);
 
     Future.delayed(const Duration(seconds: 2), () {
-      overlayEntry.remove();
+      if (mounted) overlayEntry.remove();
     });
   }
 
-  /// Submit action
-  void _submitReport() {
+  Future<void> _submitReport() async {
     if (_reportController.text.trim().isEmpty) {
-      _showSuccessMessage("Please write your problem first");
+      _showMessage("Please write your problem first", isError: true);
       return;
     }
 
-    _showSuccessMessage("Report sent successfully ✔");
+    setState(() => _isLoading = true);
 
-    _reportController.clear();
-    setState(() {});
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+
+      await FirebaseFirestore.instance.collection('support_reports').add({
+        'message': _reportController.text.trim(),
+        'createdAt': FieldValue.serverTimestamp(),
+        'status': 'pending',
+        'userId': user?.uid ?? 'anonymous',
+        'userName': user?.displayName ?? 'Unknown',
+        'userEmail': user?.email ?? 'No email',
+      });
+
+      _showMessage("Report sent successfully ✔");
+      _reportController.clear();
+    } catch (e) {
+      _showMessage("Something went wrong, please try again", isError: true);
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -91,7 +116,6 @@ class _SupportScreenState extends State<SupportScreen> {
                         onPressed: () => Navigator.pop(context),
                       ),
                     ),
-
                     Text(
                       "Support Center",
                       style: GoogleFonts.poppins(
@@ -99,7 +123,6 @@ class _SupportScreenState extends State<SupportScreen> {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-
                     const CircleAvatar(
                       backgroundColor: Color(0xFF8B1E3F),
                       radius: 18,
@@ -150,9 +173,7 @@ class _SupportScreenState extends State<SupportScreen> {
                         ),
                         child: const Icon(Icons.email_outlined),
                       ),
-
                       const SizedBox(width: 15),
-
                       const Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -175,9 +196,7 @@ class _SupportScreenState extends State<SupportScreen> {
                           ],
                         ),
                       ),
-
                       const SizedBox(width: 10),
-
                       Padding(
                         padding: const EdgeInsets.only(top: 4),
                         child: Container(
@@ -206,7 +225,6 @@ class _SupportScreenState extends State<SupportScreen> {
 
                 /// Report Problem Card
                 Container(
-                  height: 240,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 20,
                     vertical: 18,
@@ -225,16 +243,12 @@ class _SupportScreenState extends State<SupportScreen> {
                           fontSize: 18,
                         ),
                       ),
-
                       const SizedBox(height: 8),
-
                       const Text(
                         "Let us know if something isn't working right.",
                         style: TextStyle(color: Colors.grey, fontSize: 13),
                       ),
-
                       const SizedBox(height: 12),
-
                       SizedBox(
                         height: 90,
                         child: TextField(
@@ -253,24 +267,31 @@ class _SupportScreenState extends State<SupportScreen> {
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 10),
-
                       SizedBox(
                         width: double.infinity,
                         height: 38,
                         child: ElevatedButton(
-                          onPressed: _submitReport,
+                          onPressed: _isLoading ? null : _submitReport,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF8B1E3F),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-                          child: const Text(
-                            "Submit Report",
-                            style: TextStyle(color: Colors.white),
-                          ),
+                          child: _isLoading
+                              ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Text(
+                                  "Submit Report",
+                                  style: TextStyle(color: Colors.white),
+                                ),
                         ),
                       ),
                     ],

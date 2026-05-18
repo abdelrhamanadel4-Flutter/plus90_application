@@ -19,7 +19,6 @@ class _AllExpiringSoonScreenState extends State<AllExpiringSoonScreen> {
     super.dispose();
   }
 
-  /// بترجع نص الوقت المتبقي
   String _timeLeft(DateTime expiry) {
     final now = DateTime.now();
     final diff = expiry.difference(now);
@@ -35,7 +34,6 @@ class _AllExpiringSoonScreenState extends State<AllExpiringSoonScreen> {
     }
   }
 
-  /// لون badge حسب الوقت المتبقي
   Color _badgeColor(DateTime expiry) {
     final diff = expiry.difference(DateTime.now());
     if (diff.inHours < 6) return Colors.red;
@@ -159,7 +157,6 @@ class _AllExpiringSoonScreenState extends State<AllExpiringSoonScreen> {
 
                   final now = DateTime.now();
 
-                  // فلتر المنتهية وجيب اللي لسه شغالة بس
                   var deals = snapshot.data!.docs.where((doc) {
                     final data = doc.data() as Map<String, dynamic>;
                     final expiry = data['expiry'];
@@ -167,10 +164,15 @@ class _AllExpiringSoonScreenState extends State<AllExpiringSoonScreen> {
                     final expiryDate = DateTime.tryParse(expiry);
                     if (expiryDate == null) return false;
                     if (expiryDate.isBefore(now)) return false;
+
+                    // ✅ إخفاء المنتجات اللي stock = 0 أو مش موجود
+                    final stock = data['stock'];
+                    if (stock == null || (stock is num && stock <= 0))
+                      return false;
+
                     return true;
                   }).toList();
 
-                  // ✅ رتب من الأقرب للانتهاء
                   deals.sort((a, b) {
                     final dataA = a.data() as Map<String, dynamic>;
                     final dataB = b.data() as Map<String, dynamic>;
@@ -179,7 +181,6 @@ class _AllExpiringSoonScreenState extends State<AllExpiringSoonScreen> {
                     return expiryA.compareTo(expiryB);
                   });
 
-                  // فلتر البحث
                   if (_searchQuery.isNotEmpty) {
                     deals = deals.where((doc) {
                       final data = doc.data() as Map<String, dynamic>;
@@ -228,7 +229,6 @@ class _AllExpiringSoonScreenState extends State<AllExpiringSoonScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  // ✅ شريط الوقت المتبقي
                                   Padding(
                                     padding: const EdgeInsets.only(bottom: 4),
                                     child: Row(

@@ -33,9 +33,7 @@ class ProfileTab extends StatelessWidget {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text("Please Login")),
-      );
+      return const Scaffold(body: Center(child: Text("Please Login")));
     }
 
     return Scaffold(
@@ -46,16 +44,18 @@ class ProfileTab extends StatelessWidget {
             .doc(user.uid)
             .snapshots(),
         builder: (context, snapshot) {
-          String displayName =
-              user.displayName?.isNotEmpty == true ? user.displayName! : "User";
+          String displayName = user.displayName?.isNotEmpty == true
+              ? user.displayName!
+              : "User";
           String? photoURL = user.photoURL;
           String totalSaved = "\$0.00";
 
           if (snapshot.hasData && snapshot.data!.exists) {
             final data = snapshot.data!.data() as Map<String, dynamic>;
 
-            final firestoreName =
-                (data['name'] ?? data['displayName'] ?? "").toString().trim();
+            final firestoreName = (data['name'] ?? data['displayName'] ?? "")
+                .toString()
+                .trim();
             if (firestoreName.isNotEmpty) displayName = firestoreName;
 
             final firestorePhoto = (data['photoURL'] ?? "").toString().trim();
@@ -63,8 +63,7 @@ class ProfileTab extends StatelessWidget {
 
             final saved = data['totalSaved'];
             if (saved != null) {
-              totalSaved =
-                  "\$${(saved as num).toDouble().toStringAsFixed(2)}";
+              totalSaved = "\$${(saved as num).toDouble().toStringAsFixed(2)}";
             }
           }
 
@@ -92,7 +91,6 @@ class ProfileTab extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Edit button
                           Align(
                             alignment: Alignment.topRight,
                             child: GestureDetector(
@@ -123,7 +121,6 @@ class ProfileTab extends StatelessWidget {
 
                           const SizedBox(height: 10),
 
-                          // Avatar
                           Stack(
                             children: [
                               Container(
@@ -184,26 +181,57 @@ class ProfileTab extends StatelessWidget {
                   ],
                 ),
 
-                // ── Stats Cards pulled up ────────────────────
+                // ── Stats Cards ──────────────────────────────
                 Transform.translate(
                   offset: const Offset(0, -36),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Row(
                       children: [
-                        // Total Sales card
+                        // ── Total Saved / Total Sales ──
                         Expanded(
-                          child: _statCard(
-                            icon: Icons.attach_money_rounded,
-                            iconBg: const Color(0xFFFBEAF0),
-                            iconColor: AppColor.orange,
-                            label: isStore ? "Total Sales" : "Total Saved",
-                            value: totalSaved,
-                          ),
+                          child: isStore
+                              ? StreamBuilder<QuerySnapshot>(
+                                  stream: FirebaseFirestore.instance
+                                      .collection('orders')
+                                      .where('storeId', isEqualTo: user.uid)
+                                      .where('status', isEqualTo: 'accepted')
+                                      .snapshots(),
+                                  builder: (context, salesSnapshot) {
+                                    double totalSales = 0;
+                                    if (salesSnapshot.hasData) {
+                                      for (var doc
+                                          in salesSnapshot.data!.docs) {
+                                        final data =
+                                            doc.data() as Map<String, dynamic>;
+                                        totalSales +=
+                                            (data['totalPrice'] as num?)
+                                                ?.toDouble() ??
+                                            0;
+                                      }
+                                    }
+                                    return _statCard(
+                                      icon: Icons.attach_money_rounded,
+                                      iconBg: const Color(0xFFFBEAF0),
+                                      iconColor: AppColor.orange,
+                                      label: "Total Sales",
+                                      value:
+                                          "\$${totalSales.toStringAsFixed(2)}",
+                                    );
+                                  },
+                                )
+                              : _statCard(
+                                  icon: Icons.attach_money_rounded,
+                                  iconBg: const Color(0xFFFBEAF0),
+                                  iconColor: AppColor.orange,
+                                  label: "Total Saved",
+                                  value: totalSaved,
+                                ),
                         ),
+
                         const SizedBox(width: 10),
 
-                        // My Products / Active Orders card (live from Firestore)
+                        // ── My Products / Active Orders ──
                         Expanded(
                           child: isStore
                               ? StreamBuilder<QuerySnapshot>(
@@ -216,9 +244,13 @@ class ProfileTab extends StatelessWidget {
                                     if (dealsSnapshot.hasData) {
                                       for (var doc
                                           in dealsSnapshot.data!.docs) {
-                                        final data = doc.data()
-                                            as Map<String, dynamic>;
-                                        if (_isActive(data['expiry'])) {
+                                        final data =
+                                            doc.data() as Map<String, dynamic>;
+                                        final stock =
+                                            (data['stock'] as num?)?.toInt() ??
+                                            0;
+                                        if (_isActive(data['expiry']) &&
+                                            stock > 0) {
                                           activeCount++;
                                         }
                                       }
@@ -236,18 +268,18 @@ class ProfileTab extends StatelessWidget {
                                   stream: FirebaseFirestore.instance
                                       .collection('orders')
                                       .where('userId', isEqualTo: user.uid)
+                                      .where('status', isEqualTo: 'pending')
                                       .snapshots(),
                                   builder: (context, ordersSnapshot) {
-                                    int ordersCount =
-                                        ordersSnapshot.hasData
-                                            ? ordersSnapshot.data!.docs.length
-                                            : 0;
+                                    int ordersCount = ordersSnapshot.hasData
+                                        ? ordersSnapshot.data!.docs.length
+                                        : 0;
                                     return _statCard(
                                       icon: Icons.shopping_bag_outlined,
                                       iconBg: const Color(0xFFEAF3DE),
                                       iconColor: const Color(0xFF3B6D11),
                                       label: "Active Orders",
-                                      value: "$ordersCount Deals",
+                                      value: "$ordersCount Orders",
                                     );
                                   },
                                 ),
@@ -278,7 +310,6 @@ class ProfileTab extends StatelessWidget {
                           ),
                         ),
 
-                        // Menu items container
                         Container(
                           decoration: BoxDecoration(
                             color: Colors.white,
@@ -293,7 +324,8 @@ class ProfileTab extends StatelessWidget {
                                   onTap: () => Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (_) => Myorders()),
+                                      builder: (_) => Myorders(),
+                                    ),
                                   ),
                                   showDivider: true,
                                 ),
@@ -304,7 +336,8 @@ class ProfileTab extends StatelessWidget {
                                   onTap: () => Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (_) => Favdeals()),
+                                      builder: (_) => Favdeals(),
+                                    ),
                                   ),
                                   showDivider: true,
                                 ),
@@ -337,7 +370,6 @@ class ProfileTab extends StatelessWidget {
 
                         const SizedBox(height: 10),
 
-                        // ── Logout ───────────────────────────
                         GestureDetector(
                           onTap: () {
                             showDialog(
@@ -350,8 +382,11 @@ class ProfileTab extends StatelessWidget {
                                 content: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    const Icon(Icons.logout,
-                                        size: 50, color: AppColor.orange),
+                                    const Icon(
+                                      Icons.logout,
+                                      size: 50,
+                                      color: AppColor.orange,
+                                    ),
                                     const SizedBox(height: 10),
                                     const Text(
                                       "Log out",
@@ -372,8 +407,9 @@ class ProfileTab extends StatelessWidget {
                                       width: double.infinity,
                                       child: ElevatedButton(
                                         style: ElevatedButton.styleFrom(
-                                          backgroundColor:
-                                              const Color(0xFF8B1E3F),
+                                          backgroundColor: const Color(
+                                            0xFF8B1E3F,
+                                          ),
                                         ),
                                         onPressed: () async {
                                           await FirebaseAuth.instance.signOut();
@@ -387,8 +423,7 @@ class ProfileTab extends StatelessWidget {
                                         },
                                         child: const Text(
                                           "Log out",
-                                          style:
-                                              TextStyle(color: Colors.white),
+                                          style: TextStyle(color: Colors.white),
                                         ),
                                       ),
                                     ),
@@ -412,7 +447,9 @@ class ProfileTab extends StatelessWidget {
                             ),
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
-                                  vertical: 15, horizontal: 16),
+                                vertical: 15,
+                                horizontal: 16,
+                              ),
                               child: Row(
                                 children: [
                                   Container(
@@ -489,10 +526,7 @@ class ProfileTab extends StatelessWidget {
             child: Icon(icon, color: iconColor, size: 18),
           ),
           const SizedBox(height: 8),
-          Text(
-            label,
-            style: const TextStyle(fontSize: 11, color: Colors.grey),
-          ),
+          Text(label, style: const TextStyle(fontSize: 11, color: Colors.grey)),
           const SizedBox(height: 2),
           Text(
             value,
@@ -519,8 +553,7 @@ class ProfileTab extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(16),
           child: Padding(
-            padding:
-                const EdgeInsets.symmetric(vertical: 13, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 16),
             child: Row(
               children: [
                 Container(
@@ -539,14 +572,16 @@ class ProfileTab extends StatelessWidget {
                     style: const TextStyle(fontSize: 14, color: Colors.black87),
                   ),
                 ),
-                const Icon(Icons.arrow_forward_ios,
-                    size: 14, color: Colors.grey),
+                const Icon(
+                  Icons.arrow_forward_ios,
+                  size: 14,
+                  color: Colors.grey,
+                ),
               ],
             ),
           ),
         ),
-        if (showDivider)
-          const Divider(height: 1, indent: 66, endIndent: 16),
+        if (showDivider) const Divider(height: 1, indent: 66, endIndent: 16),
       ],
     );
   }

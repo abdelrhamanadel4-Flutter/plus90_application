@@ -78,6 +78,7 @@ class CardItem extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  // ✅ بعد
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -89,29 +90,15 @@ class CardItem extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-
-                      Text(
-                        'Stock: ${dealData['stock'] ?? '0'}',
-                        style: AppStyle.semibold14orange,
-                        maxLines: 1,
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: Text(
+                          'Stock: ${dealData['stock'] ?? '0'}',
+                          style: AppStyle.semibold14orange,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-
-                      // GestureDetector(
-                      //   onTap: () {
-                      //     favProvider.toggleFavorite(id);
-
-                      //     DialogUtils.showMessage(
-                      //       context: context,
-                      //       message: favProvider.isFavorite(id)
-                      //           ? "Added to favorites"
-                      //           : "Removed from favorites",
-                      //     );
-                      //   },
-                      //   child: Icon(
-                      //     isFav ? Icons.favorite : Icons.favorite_border,
-                      //     color: AppColor.orange,
-                      //   ),
-                      // ),
                     ],
                   ),
 

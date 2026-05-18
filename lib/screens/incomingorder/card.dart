@@ -6,7 +6,7 @@ import 'package:plus90_application/utils/app_style.dart';
 class CardIncomingOrder extends StatelessWidget {
   final Map<String, dynamic> data;
   final String orderId;
- 
+
   final String subOrderId;
   final String buyerId;
   final List<dynamic> items;
@@ -19,7 +19,7 @@ class CardIncomingOrder extends StatelessWidget {
   const CardIncomingOrder({
     super.key,
     required this.data,
-  
+
     required this.orderId,
     required this.subOrderId,
     required this.buyerId,
@@ -54,11 +54,15 @@ class CardIncomingOrder extends StatelessWidget {
         : '#$orderId';
 
     // ── أول item في الطلب لعرض صورته وسعره ──────────────
-    final firstItem = items.isNotEmpty ? items[0] as Map<String, dynamic> : null;
+    final firstItem = items.isNotEmpty
+        ? items[0] as Map<String, dynamic>
+        : null;
     final firstTitle = firstItem?['title'] as String? ?? 'Order';
-    final firstImageUrl = firstItem?['imageUrl'] as String?;
-    final firstOriginalPrice = (firstItem?['originalPrice'] as num?)?.toDouble();
-    final firstDiscountedPrice = (firstItem?['discountedPrice'] as num?)?.toDouble();
+    final firstImageUrl = firstItem?['image'] as String?;
+    final firstOriginalPrice = (firstItem?['originalPrice'] as num?)
+        ?.toDouble();
+    final firstDiscountedPrice = (firstItem?['discountedPrice'] as num?)
+        ?.toDouble();
     final firstQuantity = firstItem?['quantity'] as int? ?? 1;
     final extraItemsCount = items.length > 1 ? items.length - 1 : 0;
 
@@ -165,10 +169,7 @@ class CardIncomingOrder extends StatelessWidget {
                           size: width(context) * 0.04,
                         ),
                         SizedBox(width: width(context) * 0.01),
-                        Text(
-                          _timeAgo(createdAt),
-                          style: AppStyle.bold12orange,
-                        ),
+                        Text(_timeAgo(createdAt), style: AppStyle.bold12orange),
                       ],
                     ),
 
@@ -193,7 +194,8 @@ class CardIncomingOrder extends StatelessWidget {
                     ],
 
                     // لو السعرين مش موجودين نعرض التوتال
-                    if (firstDiscountedPrice == null && firstOriginalPrice == null)
+                    if (firstDiscountedPrice == null &&
+                        firstOriginalPrice == null)
                       Text(
                         '\$${totalAmount.toStringAsFixed(2)}',
                         style: AppStyle.bold20orange,
@@ -225,12 +227,15 @@ class CardIncomingOrder extends StatelessWidget {
                       SizedBox(height: height(context) * 0.008),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 3),
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColor.orange.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                              color: AppColor.orange.withOpacity(0.3)),
+                            color: AppColor.orange.withOpacity(0.3),
+                          ),
                         ),
                         child: Text(
                           '+$extraItemsCount more item${extraItemsCount > 1 ? 's' : ''}',

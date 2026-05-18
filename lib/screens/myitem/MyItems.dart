@@ -31,7 +31,12 @@ class MyItems extends StatelessWidget {
             return const Center(child: Text("Something went wrong"));
           }
 
-          final deals = snapshot.data?.docs ?? [];
+          // ✅ شيل الـ deals اللي stock بتاعها 0
+          final deals = (snapshot.data?.docs ?? []).where((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            final stock = (data['stock'] as num?)?.toInt() ?? 1;
+            return stock > 0;
+          }).toList();
 
           return ListView.builder(
             padding: EdgeInsets.symmetric(
@@ -64,7 +69,6 @@ class MyItems extends StatelessWidget {
                 expiryDate = DateTime.tryParse(data['expiry']);
               }
 
-              // ✅ جيب الصور كـ List صح
               List<String> imageUrls = [];
               if (data['images'] is List) {
                 imageUrls = (data['images'] as List)
@@ -83,11 +87,8 @@ class MyItems extends StatelessWidget {
                   description: data['description'] ?? '',
                   stock: data['stock']?.toString() ?? '',
                   category: data['category'] ?? '',
-                  // ✅ بعت أول صورة للعرض في الكارد
                   imageUrl: imageUrls.isNotEmpty ? imageUrls.first : null,
-                  // ✅ بعت كل الصور للـ edit
-                  imageUrls: imageUrls, // ✅ هنا كانت ناقصة
-
+                  imageUrls: imageUrls,
                   expiryDate: expiryDate,
                 ),
               );

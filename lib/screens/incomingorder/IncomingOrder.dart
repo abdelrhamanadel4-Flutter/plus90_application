@@ -19,7 +19,6 @@ class IncomingOrder extends StatelessWidget {
     'Unable to fulfill at this time',
   ];
 
-  // ── Approve ──────────────────────────────────────────
   Future<void> _approveOrder(
     BuildContext context,
     String orderId,
@@ -34,6 +33,7 @@ class IncomingOrder extends StatelessWidget {
     try {
       double totalSales = 0;
       double totalSaved = 0;
+
       final subOrderRef = firestore
           .collection('orders')
           .doc(orderId)
@@ -41,14 +41,16 @@ class IncomingOrder extends StatelessWidget {
           .doc(subOrderId);
       batch.update(subOrderRef, {'status': 'approved'});
 
+      // ✅ غير status الـ order الأساسي
+      final orderRef = firestore.collection('orders').doc(orderId);
+      batch.update(orderRef, {'status': 'confirmed'});
+
       for (final item in items) {
         final dealId = item['dealId'] as String?;
         final quantity = item['quantity'] as int? ?? 1;
-
         final price = (item['price'] ?? 0).toDouble();
         final oldPrice = (item['oldPrice'] ?? price).toDouble();
 
-        // 🟢 الحسابات
         totalSales += price * quantity;
         totalSaved += (oldPrice - price) * quantity;
 
@@ -71,12 +73,13 @@ class IncomingOrder extends StatelessWidget {
       });
 
       await batch.commit();
-      await FirebaseFirestore.instance
+
+      await firestore
           .collection('users')
           .doc(FirebaseAuth.instance.currentUser!.uid)
           .update({"totalSales": FieldValue.increment(totalSales)});
 
-      await FirebaseFirestore.instance.collection('users').doc(buyerId).update({
+      await firestore.collection('users').doc(buyerId).update({
         "totalSaved": FieldValue.increment(totalSaved),
       });
 
@@ -100,7 +103,6 @@ class IncomingOrder extends StatelessWidget {
     }
   }
 
-  // ── Rejection Dialog ─────────────────────────────────
   Future<void> _showRejectionDialog(
     BuildContext context,
     String orderId,
@@ -218,7 +220,6 @@ class IncomingOrder extends StatelessWidget {
     );
   }
 
-  // ── Reject ───────────────────────────────────────────
   Future<void> _rejectOrder(
     BuildContext context,
     String orderId,
@@ -241,6 +242,10 @@ class IncomingOrder extends StatelessWidget {
         'status': 'rejected',
         'rejectionReason': reason,
       });
+
+      // ✅ غير status الـ order الأساسي
+      final orderRef = firestore.collection('orders').doc(orderId);
+      batch.update(orderRef, {'status': 'rejected'});
 
       final notifRef = firestore.collection('notifications').doc();
       batch.set(notifRef, {

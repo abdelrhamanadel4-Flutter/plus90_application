@@ -8,6 +8,7 @@ class AllStoresNearbyScreen extends StatefulWidget {
   AllStoresNearbyScreen({super.key, this.userLat, this.userLng});
   double? userLat;
   double? userLng;
+
   @override
   State<AllStoresNearbyScreen> createState() => AllStoresNearbyScreenState();
 }
@@ -183,7 +184,6 @@ class AllStoresNearbyScreenState extends State<AllStoresNearbyScreen> {
 
                   final now = DateTime.now();
 
-                  // فلتر الـ deals المنتهية
                   var deals = snapshot.data!.docs.where((doc) {
                     final data = doc.data() as Map<String, dynamic>;
                     final expiry = data['expiry'];
@@ -191,10 +191,15 @@ class AllStoresNearbyScreenState extends State<AllStoresNearbyScreen> {
                     final expiryDate = DateTime.tryParse(expiry);
                     if (expiryDate == null) return false;
                     if (expiryDate.isBefore(now)) return false;
+
+                    // ✅ إخفاء المنتجات اللي stock = 0 أو مش موجود
+                    final stock = data['stock'];
+                    if (stock == null || (stock is num && stock <= 0))
+                      return false;
+
                     return true;
                   }).toList();
 
-                  // رتب من الأقرب لو عندنا location اليوزر
                   if (userLat != null && userLng != null) {
                     deals.sort((a, b) {
                       final dataA = a.data() as Map<String, dynamic>;
@@ -222,7 +227,6 @@ class AllStoresNearbyScreenState extends State<AllStoresNearbyScreen> {
                     });
                   }
 
-                  // فلتر البحث
                   if (_searchQuery.isNotEmpty) {
                     deals = deals.where((doc) {
                       final data = doc.data() as Map<String, dynamic>;
@@ -248,7 +252,6 @@ class AllStoresNearbyScreenState extends State<AllStoresNearbyScreen> {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // عدد النتائج
                       Text(
                         "${deals.length} store${deals.length != 1 ? 's' : ''} found",
                         style: TextStyle(
@@ -267,7 +270,6 @@ class AllStoresNearbyScreenState extends State<AllStoresNearbyScreen> {
                                 deals[index].data() as Map<String, dynamic>;
                             final id = deals[index].id;
 
-                            // احسب المسافة لعرضها
                             String? distanceText;
                             if (userLat != null && userLng != null) {
                               final lat =
@@ -290,7 +292,6 @@ class AllStoresNearbyScreenState extends State<AllStoresNearbyScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  // Distance badge
                                   if (distanceText != null)
                                     Padding(
                                       padding: const EdgeInsets.only(bottom: 4),
