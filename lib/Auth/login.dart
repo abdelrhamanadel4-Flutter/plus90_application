@@ -73,8 +73,9 @@ class _LoginState extends State<Login> {
                   keyboardType: TextInputType.emailAddress,
                   hintStyle: AppStyle.medium11ramdi,
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty)
+                    if (v == null || v.trim().isEmpty) {
                       return 'Please enter email';
+                    }
                     final valid = RegExp(
                       r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
                     ).hasMatch(v.trim());
@@ -101,10 +102,12 @@ class _LoginState extends State<Login> {
                         setState(() => _obscurePassword = !_obscurePassword),
                   ),
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty)
+                    if (v == null || v.trim().isEmpty) {
                       return 'Please enter password';
-                    if (v.trim().length < 6)
+                    }
+                    if (v.trim().length < 6) {
                       return 'Password must be at least 6 characters';
+                    }
                     return null;
                   },
                 ),

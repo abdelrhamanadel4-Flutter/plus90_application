@@ -93,8 +93,9 @@ class _RegistersState extends State<Registers> {
                   hint: 'Enter your email address',
                   keyboardType: TextInputType.emailAddress,
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty)
+                    if (v == null || v.trim().isEmpty) {
                       return 'Please enter your email';
+                    }
                     final valid = RegExp(
                       r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
                     ).hasMatch(v.trim());
@@ -110,8 +111,9 @@ class _RegistersState extends State<Registers> {
                   hint: 'Enter your phone number',
                   keyboardType: TextInputType.phone,
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty)
+                    if (v == null || v.trim().isEmpty) {
                       return 'Please enter your phone number';
+                    }
                     return RegExp(r'^\+?[0-9]{7,15}$').hasMatch(v.trim())
                         ? null
                         : 'Please enter valid phone number';
@@ -136,10 +138,12 @@ class _RegistersState extends State<Registers> {
                         setState(() => _obscurePassword = !_obscurePassword),
                   ),
                   validator: (v) {
-                    if (v == null || v.isEmpty)
+                    if (v == null || v.isEmpty) {
                       return 'Please enter your password';
-                    if (v.length < 8)
+                    }
+                    if (v.length < 8) {
                       return 'Password must be at least 8 characters';
+                    }
                     return null;
                   },
                 ),

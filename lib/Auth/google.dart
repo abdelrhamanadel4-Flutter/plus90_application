@@ -60,8 +60,7 @@ class GoogleSignInService {
   Future<AuthCredential> getFirebaseCredential(
     GoogleSignInAccount googleUser,
   ) async {
-    final GoogleSignInAuthentication googleAuth =
-        await googleUser.authentication;
+    final GoogleSignInAuthentication googleAuth = googleUser.authentication;
 
     print('✅ idToken: ${googleAuth.idToken != null ? "exists" : "null"}');
 

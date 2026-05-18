@@ -7,10 +7,7 @@ import 'package:plus90_application/Home/user/tabs/Home/seeall_expringsoon.dart';
 import 'package:plus90_application/Home/user/tabs/Home/seeall_storesnear.dart';
 import 'package:plus90_application/screens/notification_screen.dart';
 import 'package:plus90_application/utils/AppRoutes.dart';
-import 'package:plus90_application/utils/app-assets.dart';
 import 'package:plus90_application/utils/app_color.dart';
-import 'package:plus90_application/utils/app_style.dart';
-import 'package:plus90_application/utils/custom_text_from.dart';
 
 class HomeUI extends StatefulWidget {
   const HomeUI({super.key});

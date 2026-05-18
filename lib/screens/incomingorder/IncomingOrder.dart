@@ -32,6 +32,8 @@ class IncomingOrder extends StatelessWidget {
     final batch = firestore.batch();
 
     try {
+      double totalSales = 0;
+      double totalSaved = 0;
       final subOrderRef = firestore
           .collection('orders')
           .doc(orderId)
@@ -42,6 +44,14 @@ class IncomingOrder extends StatelessWidget {
       for (final item in items) {
         final dealId = item['dealId'] as String?;
         final quantity = item['quantity'] as int? ?? 1;
+
+        final price = (item['price'] ?? 0).toDouble();
+        final oldPrice = (item['oldPrice'] ?? price).toDouble();
+
+        // 🟢 الحسابات
+        totalSales += price * quantity;
+        totalSaved += (oldPrice - price) * quantity;
+
         if (dealId != null) {
           final dealRef = firestore.collection('deals').doc(dealId);
           batch.update(dealRef, {'stock': FieldValue.increment(-quantity)});
@@ -61,6 +71,14 @@ class IncomingOrder extends StatelessWidget {
       });
 
       await batch.commit();
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .update({"totalSales": FieldValue.increment(totalSales)});
+
+      await FirebaseFirestore.instance.collection('users').doc(buyerId).update({
+        "totalSaved": FieldValue.increment(totalSaved),
+      });
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -98,7 +116,8 @@ class IncomingOrder extends StatelessWidget {
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setStateDialog) => AlertDialog(
           shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20)),
+            borderRadius: BorderRadius.circular(20),
+          ),
           contentPadding: const EdgeInsets.all(20),
           title: const Text(
             'Reason for Rejection',
@@ -122,7 +141,9 @@ class IncomingOrder extends StatelessWidget {
                   child: Container(
                     margin: const EdgeInsets.only(bottom: 8),
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 12),
+                      horizontal: 14,
+                      vertical: 12,
+                    ),
                     decoration: BoxDecoration(
                       color: selectedReason == reason
                           ? const Color(0xFFFBEAF0)
@@ -166,14 +187,14 @@ class IncomingOrder extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('Cancel',
-                  style: TextStyle(color: Colors.grey)),
+              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF861E43),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
               onPressed: selectedReason == null
                   ? null
@@ -189,8 +210,7 @@ class IncomingOrder extends StatelessWidget {
                         storeName,
                       );
                     },
-              child: const Text('Send',
-                  style: TextStyle(color: Colors.white)),
+              child: const Text('Send', style: TextStyle(color: Colors.white)),
             ),
           ],
         ),
@@ -262,9 +282,7 @@ class IncomingOrder extends StatelessWidget {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text('Please Login')),
-      );
+      return const Scaffold(body: Center(child: Text('Please Login')));
     }
 
     return StreamBuilder<QuerySnapshot>(
@@ -290,12 +308,15 @@ class IncomingOrder extends StatelessWidget {
                 if (pendingCount > 0)
                   Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 4),
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColor.orange.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                          color: AppColor.orange.withOpacity(0.3)),
+                        color: AppColor.orange.withOpacity(0.3),
+                      ),
                     ),
                     child: Text(
                       '$pendingCount pending',
@@ -318,8 +339,11 @@ class IncomingOrder extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.inbox_outlined,
-                          size: 60, color: AppColor.orange),
+                      const Icon(
+                        Icons.inbox_outlined,
+                        size: 60,
+                        color: AppColor.orange,
+                      ),
                       SizedBox(height: height(context) * 0.015),
                       const Text(
                         'No incoming orders',
@@ -349,12 +373,10 @@ class IncomingOrder extends StatelessWidget {
                       (data['totalAmount'] as num?)?.toDouble() ?? 0.0;
                   final items = data['items'] as List<dynamic>? ?? [];
                   final createdAt = data['createdAt'] as Timestamp?;
-                  final storeName =
-                      data['storeName'] as String? ?? 'Our Store';
+                  final storeName = data['storeName'] as String? ?? 'Our Store';
 
                   return Padding(
-                    padding:
-                        EdgeInsets.only(bottom: height(context) * 0.015),
+                    padding: EdgeInsets.only(bottom: height(context) * 0.015),
                     child: CardIncomingOrder(
                       data: data,
                       orderId: orderId,
