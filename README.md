@@ -1,70 +1,110 @@
 # +90 — Nearby Time-Limited Offers 📍
 
-A Flutter mobile application for discovering offers and deals available around the user within limited time windows.
+A Flutter mobile application designed to help users discover nearby offers and deals available within limited time windows.
 
-> This repository contains the Flutter application foundation for the +90 project (onboarding, authentication, and home shell). No backend/API has been integrated yet.
+> **Project Status:** The current application includes the core Flutter experience, authentication, account-type selection, Firebase integration, and the initial home screen foundation.
+
+---
 
 ## ✨ Overview
 
-**+90** is built around a simple idea: help users discover offers available around them, while giving sellers a way to present their offers. The current codebase focuses on the application foundation — the splash and onboarding flow, the authentication journey with account-type selection, and the home screen shell.
+**+90** is a Flutter-based mobile application built around a simple idea: making it easier for users to discover offers and deals available around them within specific time windows.
+
+The application provides separate account types and uses Firebase services to handle authentication and cloud data management.
+
+The current application flow includes:
+
+**Splash → Onboarding → Authentication → Account Type → Home**
+
+---
 
 ## 🚀 Features
 
 - 💠 Splash screen
-- 📲 Onboarding flow with smooth page indicators
-- 🔐 Authentication entry flow
-- 👤 Login and registration screens
+- 📲 Onboarding experience
+- 🔐 Firebase Authentication
+- 👤 User login
+- 📝 User registration
 - 🏷️ Account type selection
-- 🏠 Home screen shell
-- 🧭 Named-route navigation
-- ✍️ Custom typography with Google Fonts
+- 🏠 Home screen
+- ☁️ Cloud Firestore integration
+- 📦 Firebase Storage integration
+- 🧭 Centralized named-route navigation
+- ✨ Smooth onboarding indicators
+- 🔤 Custom typography using Google Fonts
+- 📱 Responsive Flutter UI
+
+---
+
+## 🔥 Firebase
+
+The application uses Firebase as part of its backend infrastructure.
+
+### Firebase Authentication
+
+Used for handling user authentication and account access.
+
+- User registration
+- User login
+- Authentication state
+
+### Cloud Firestore
+
+Used for storing and managing application data in the cloud.
+
+### Firebase Storage
+
+Used for storing and managing uploaded files and images.
+
+---
 
 ## 🛠️ Tech Stack
 
 ### Framework & Language
 
-- Flutter
-- Dart
+- **Flutter**
+- **Dart**
+
+### Backend & Cloud Services
+
+- **Firebase Authentication**
+- **Cloud Firestore**
+- **Firebase Storage**
 
 ### UI & Design
 
-- Material Design
-- `google_fonts` — custom typography
-- `smooth_page_indicator` — onboarding indicators
-- `cupertino_icons`
+- **Material Design**
+- **Google Fonts**
+- **Smooth Page Indicator**
+- **Cupertino Icons**
 
 ### Navigation
 
-- Named routes defined centrally in `utils/AppRoutes.dart`
+- Named Routes
+- Centralized route management
+
+---
 
 ## 🏗️ Project Structure
 
-```
+```text
 lib/
-├── Auth/          # login, registration, account type selection
-├── Home/          # home screen
-├── Splach/        # splash screen
-├── onBorading/    # onboarding pages
-└── utils/         # routes, colors, styles, shared widgets
-```
-
-## 📱 Application Version
-
-Current project version: **1.0.0+1**
-
-## 📸 Screenshots
-
-Add screenshots here to showcase the main flows, including onboarding, authentication, account type selection, and the home screen.
-
-## ▶️ Getting Started
-
-```bash
-git clone https://github.com/abdelrhamanadel4-Flutter/plus90_application.git
-cd plus90_application
-flutter pub get
-flutter run
-```
-
-## 📄 Note
-
-The current build is a UI foundation. Authentication and offers functionality are not yet wired to a real backend.
+├── Auth/
+│   ├── Login/
+│   ├── Register/
+│   └── ChooseType/
+│
+├── Home/
+│   └── HomeScreen
+│
+├── Splach/
+│   └── Splash Screen
+│
+├── onBorading/
+│   └── Onboarding Screens
+│
+└── utils/
+    ├── AppRoutes.dart
+    ├── Colors
+    ├── Styles
+    └── Shared Utilities
